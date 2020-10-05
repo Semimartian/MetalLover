@@ -60,7 +60,7 @@ public class MagnetManager : MonoBehaviour
     {
         for (int j = 0; j < magnets.Length; j++)
         {
-            bool isMagneto = magnets[j] == magneto;
+            bool isMagneto = false && magnets[j] == magneto;
             Attraction magnetAttraction = magnets[j].AttractionField;
            // Vector3 magnetPosition = magnets[j].attrractivePoint.position;
             for (int i = 0; i < metalObjects.Length; i++)
