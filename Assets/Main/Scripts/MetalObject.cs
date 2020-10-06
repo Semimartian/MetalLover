@@ -8,7 +8,11 @@ public class MetalObject : MonoBehaviour
     //public bool isAttached;
     public Rigidbody rigidbody;
     public float attractionForce;
-
+    [SerializeField] private sbyte tier;
+    public sbyte Tier
+    {
+        get { return tier; }
+    }
     //public Magnet magnetAttached =null;
     /*public bool IsAttachedTo(Magnet magnet)
     {
