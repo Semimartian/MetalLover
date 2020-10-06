@@ -12,6 +12,8 @@ public class Magneto : Magnet
     {
         public float sizeMultiplier;
         public float mass;
+        public float speed;
+
         public Attraction attractionField;
     }
 
@@ -23,7 +25,7 @@ public class Magneto : Magnet
     }
 
     [SerializeField] private sbyte currentMagnetoLevelIndex = 0;
-
+    public sbyte CurrentMagnetoLevelIndex => currentMagnetoLevelIndex;
     private Transform myTransform;
 
     [SerializeField] float rotationPerSecond;
@@ -67,15 +69,18 @@ public class Magneto : Magnet
     [SerializeField] private float scaleSpeed;
     private IEnumerator Scale()
     {
-        if (currentMagnetoLevelIndex > 0)
-        {
-            //TODO: this whole logic thing is sloppyy
-            camera.ScaleOffsetFromTarget(1.5f);
 
-        }
         float scaleMultiplier = magnetoLevel.sizeMultiplier;
         float previousMass = rigidbody.mass;
         float previousSize = body.localScale.x;
+
+        if (currentMagnetoLevelIndex > 0)
+        {
+            //TODO: this whole logic thing is sloppyy
+            float cameraScaler = scaleMultiplier / previousSize;
+            camera.ScaleOffsetFromTarget(cameraScaler);
+            Debug.Log("CameraScaler" + cameraScaler);
+        }
 
         while (body.localScale.x < scaleMultiplier)
         {
@@ -123,7 +128,8 @@ public class Magneto : Magnet
             }
             if (Input.GetMouseButton(0))
             {
-                float speed = (defaultSpeed + speedBoost);// * rigidbody.mass;//TODO: casche
+                float speed = 
+                    ( magnetoLevel.speed + speedBoost);// * rigidbody.mass;//TODO: casche
                 rigidbody.AddForce
                     (myTransform.forward * speed , ForceMode.Acceleration);
                 //myTransform.Translate(Vector3.forward * currentSpeed * deltaTime);

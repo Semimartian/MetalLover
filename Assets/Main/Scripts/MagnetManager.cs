@@ -33,8 +33,6 @@ public class MagnetManager : MonoBehaviour
     private Magnet[] magnets;
     [SerializeField] private MagnetDistortion MagnetDistortionPreFab;
 
-
-
     void Start()
     {
         metalObjects = FindObjectsOfType<MetalObject>();
@@ -56,7 +54,7 @@ public class MagnetManager : MonoBehaviour
         }
     }
 
-    [SerializeField] PhysicMaterial metalPhysicsMat;
+    [SerializeField] private PhysicMaterial metalPhysicsMat;
     private void InitailaiseMetalObjects()
     {
         for (int i = 0; i < metalObjects.Length; i++)
@@ -100,7 +98,14 @@ public class MagnetManager : MonoBehaviour
             {
                 magnets[j].DrawAttractionField();
             }
+
+            Attraction magnetAttraction = magneto.AttractionField;
+
+            Gizmos.DrawWireCube
+                (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
         }
+
+        
     }
     #endregion
     public static void ConformToMagnetoLevel(sbyte level)
@@ -126,47 +131,59 @@ public class MagnetManager : MonoBehaviour
         }
     }
 
+    private float boundsExpansion = 3f;
     private void ManageMetalObjects(/*float deltaTime*/)
     {
+        sbyte magnetoLevel = magneto.CurrentMagnetoLevelIndex;
         for (int j = 0; j < magnets.Length; j++)
         {
-            bool isMagneto = false && magnets[j] == magneto;
+            bool isMagneto = magnets[j] == magneto;
             Attraction magnetAttraction = magnets[j].AttractionField;
-           // Vector3 magnetPosition = magnets[j].attrractivePoint.position;
+            Bounds bounds = new Bounds
+                (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
+            float magnetAttractionDistance = magnetAttraction.radius;
+
+            // Vector3 magnetPosition = magnets[j].attrractivePoint.position;
             for (int i = 0; i < metalObjects.Length; i++)
             {
                 MetalObject metalObject = metalObjects[i];
                 //if (!metalObject.IsAttachedTo(magnets[j]))
                 {
-                  Transform metalObjectTransform = metalObject.transform;
-                  float distanceFromMagnet = 
-                        Vector3.Distance(magnetAttraction.centre.position, metalObjectTransform.position);
-                  float magnetAttractionDistance = magnetAttraction.radius;
+
+
+                        Transform metalObjectTransform = metalObject.transform;
+                    Vector3 metalObjectPosition = metalObjectTransform.position;
+                    if (!bounds.Contains(metalObjectPosition))
+                    {
+                        continue;
+                    }
+                    float distanceFromMagnet = 
+                        Vector3.Distance(magnetAttraction.centre.position, metalObjectPosition);
                   if (distanceFromMagnet <= magnetAttractionDistance)
                   {
                        // Debug.Log("distanceFromMagnet" + distanceFromMagnet);
                         float attractionSpeed =
                           (Mathf.Abs(distanceFromMagnet - magnetAttractionDistance) / magnetAttractionDistance) 
                           * magnetAttraction.force;
-                      /*if (metalObject.IsAttachedToSomeMagnet())
-                      {
-                          if(attractionSpeed> metalObject.attraction)
-                          {
-                              metalObject.Detach();
-                          }
-                          else
-                          {
-                              continue;
-                          }
-                      }*/
+                        /*if (metalObject.IsAttachedToSomeMagnet())
+                        {
+                            if(attractionSpeed> metalObject.attraction)
+                            {
+                                metalObject.Detach();
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }*/
 
-                      metalObjects[i].rigidbody.AddForce
-                          ((magnetAttraction.centre.position - metalObjectTransform.position).normalized
+                        metalObject.rigidbody.AddForce
+                          ((magnetAttraction.centre.position - metalObjectPosition).normalized
                           * (attractionSpeed /** deltaTime*/),ForceMode.Force);
-                        if (isMagneto)
+                        if (isMagneto && magnetoLevel < metalObject.Tier)
                         {
                             magneto.AddForce
-                                (( metalObjectTransform.position - magnetAttraction.centre.position ).normalized
+                                ((metalObjectPosition - magnetAttraction.centre.position ).normalized
                                 * (metalObject.attractionForce /** deltaTime*/), ForceMode.Force);
                         }
                   }
