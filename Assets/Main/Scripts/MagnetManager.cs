@@ -62,6 +62,7 @@ public class MagnetManager : MonoBehaviour
         for (int i = 0; i < metalObjects.Length; i++)
         {
             MetalObject metalObject = metalObjects[i];
+            metalObject.transform.localScale = Vector3.one;
             ref MetalObjectProperties properties =ref metalObjectPropertiesByTiers[metalObject.Tier];
             metalObject.rigidbody.mass = properties.mass;
             metalObject.attractionForce = properties.attraction;

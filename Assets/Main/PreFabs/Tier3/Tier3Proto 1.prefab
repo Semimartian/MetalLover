@@ -137,7 +137,7 @@ Transform:
   m_GameObject: {fileID: 8369870933135269219}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.7, y: -1.11, z: 26.1}
-  m_LocalScale: {x: 1, y: 1, z: 0.65407}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2794242485251638548}
   - {fileID: 8966132320586491507}
@@ -186,8 +186,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.1855367, y: 0.2354117, z: 0.89266944}
-  m_Center: {x: -0.008440743, y: 0.78892064, z: -0.087834425}
+  m_Size: {x: 0.14716332, y: 0.24669787, z: 0.875965}
+  m_Center: {x: -0.0005402969, y: 0.7945639, z: -0.079482146}
 --- !u!65 &2466674287523090137
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -199,8 +199,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.21852762, y: 0.68600655, z: 1.7802458}
-  m_Center: {x: 0.008348697, y: 0.33486143, z: -0.0000034572981}
+  m_Size: {x: 0.18464158, y: 0.6860067, z: 1.7802458}
+  m_Center: {x: 0.01010145, y: 0.33486146, z: -0.000003460915}
 --- !u!65 &3481645446708295242
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -212,8 +212,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.60354173, y: 0.17197475, z: 0.36963725}
-  m_Center: {x: -0.000017190452, y: 0.9810536, z: 0.16609974}
+  m_Size: {x: 0.60354173, y: 0.1484994, z: 0.27736574}
+  m_Center: {x: -0.000017189212, y: 0.9927936, z: 0.15655442}
 --- !u!1001 &8962571172815993471
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -271,15 +271,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4339951649856524, guid: 4a2850e017bf51b41bdaf9de0b08f9b9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 9.489023
+      value: 6.2
       objectReference: {fileID: 0}
     - target: {fileID: 4339951649856524, guid: 4a2850e017bf51b41bdaf9de0b08f9b9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 6.206486
+      value: 6.2
       objectReference: {fileID: 0}
     - target: {fileID: 4339951649856524, guid: 4a2850e017bf51b41bdaf9de0b08f9b9, type: 3}
       propertyPath: m_LocalScale.y
-      value: 6.206486
+      value: 6.2
       objectReference: {fileID: 0}
     - target: {fileID: 64319276493779814, guid: 4a2850e017bf51b41bdaf9de0b08f9b9,
         type: 3}
