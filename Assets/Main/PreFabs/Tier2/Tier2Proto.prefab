@@ -282,6 +282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 8369870933135269230}
   attractionForce: 250
+  tier: 1
 --- !u!54 &8369870933135269230
 Rigidbody:
   m_ObjectHideFlags: 0

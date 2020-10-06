@@ -22,7 +22,7 @@ public class Magneto : Magnet
         get { return magnetoLevel.attractionField; }
     }
 
-    [SerializeField] private int currentMagnetoLevelIndex = 0;
+    [SerializeField] private sbyte currentMagnetoLevelIndex = 0;
 
     private Transform myTransform;
 
@@ -58,10 +58,12 @@ public class Magneto : Magnet
         }
         //MagnetoLevel magnetoLevel = magnetoLevels[currentMagnetoLevelIndex];
         StartCoroutine(Scale());
-
+        MagnetManager.ConformToMagnetoLevel(currentMagnetoLevelIndex);
     }
 
     [SerializeField] private Transform body;
+    [SerializeField] private Transform shell;
+
     [SerializeField] private float scaleSpeed;
     private IEnumerator Scale()
     {
@@ -80,8 +82,9 @@ public class Magneto : Magnet
            // Debug.Log( body.localScale.x + "<"+ multiplier);
 
             yield return new WaitForFixedUpdate();
-            body.localScale += Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
-
+            Vector3 scaleAddition = Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
+            body.localScale += scaleAddition;
+            shell.localScale += scaleAddition;
             {
                 float newMass = Mathf.Lerp(previousMass, magnetoLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
@@ -89,6 +92,8 @@ public class Magneto : Magnet
             }
         }
         body.localScale = Vector3.one * scaleMultiplier;
+        shell.localScale = Vector3.one * scaleMultiplier;
+
         rigidbody.mass = magnetoLevel.mass;
 
     }
@@ -133,27 +138,7 @@ public class Magneto : Magnet
             lastSpeedCheck = time;
         }*/
     }
-    private List<MetalObject> metalObjectsTouching = new List<MetalObject>();
-    private void OnCollisionEnter(Collision collision)
-    {
-        MetalObject metalObject = collision.gameObject.GetComponent<MetalObject>();
-        if (metalObject != null)
-        {
-            if (!metalObjectsTouching.Contains(metalObject))
-            {
-                metalObjectsTouching.Add(metalObject);
-            }
-        }
-    }
 
-    private void OnCollisionExit(Collision collision)
-    {
-        MetalObject metalObject = collision.gameObject.GetComponent<MetalObject>();
-        if (metalObject != null)
-        {
-            metalObjectsTouching.Remove(metalObject);
-        }
-    }
   
     public void AddForce(Vector3 force, ForceMode mode)
     {

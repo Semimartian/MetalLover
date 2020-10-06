@@ -4,10 +4,37 @@ using UnityEngine;
 
 public class MagnetManager : MonoBehaviour
 {
+
+    private static MagnetManager instance;
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+
+        }
+        else
+        {
+            Debug.LogError("Can't have more than one MagnetManager!");
+        }
+    }
+
+    [System.Serializable]
+    private struct MetalObjectProperties
+    {
+        public float attraction;
+        public float mass;
+    }
+
+   [SerializeField] private MetalObjectProperties[] metalObjectPropertiesByTiers;
+
     private MetalObject[] metalObjects;
     //[SerializeField] private Transform magnet;
     private Magnet[] magnets;
     [SerializeField] private MagnetDistortion MagnetDistortionPreFab;
+
+
+
     void Start()
     {
         metalObjects = FindObjectsOfType<MetalObject>();
@@ -17,14 +44,32 @@ public class MagnetManager : MonoBehaviour
             magnets[i].Initialise();
         }
         CreateMagnetDistortions();
-
+        InitailaiseMetalObjects();
     }
+
     private void CreateMagnetDistortions()
     {
         for (int i = 0; i < magnets.Length; i++)
         {
             MagnetDistortion distortion = Instantiate(MagnetDistortionPreFab);
             distortion.Constructor(magnets[i].AttractionField.centre, magnets[i].AttractionField.radius);
+        }
+    }
+
+    [SerializeField] PhysicMaterial metalPhysicsMat;
+    private void InitailaiseMetalObjects()
+    {
+        for (int i = 0; i < metalObjects.Length; i++)
+        {
+            MetalObject metalObject = metalObjects[i];
+            ref MetalObjectProperties properties =ref metalObjectPropertiesByTiers[metalObject.Tier];
+            metalObject.rigidbody.mass = properties.mass;
+            metalObject.attractionForce = properties.attraction;
+           Collider[] colliders= metalObject.GetComponentsInChildren<Collider>();
+            for (int j = 0; j < colliders.Length; j++)
+            {
+                colliders[j].material = metalPhysicsMat;
+            }
         }
     }
 
@@ -36,6 +81,7 @@ public class MagnetManager : MonoBehaviour
 
     }
 
+    #region Draw:
     private bool drawAttractionFields = false;
     private void Update()
     {
@@ -52,6 +98,29 @@ public class MagnetManager : MonoBehaviour
             for (int j = 0; j < magnets.Length; j++)
             {
                 magnets[j].DrawAttractionField();
+            }
+        }
+    }
+    #endregion
+    public static void ConformToMagnetoLevel(sbyte level)
+    {
+        instance.MyConformToMagnetoLevel(level);
+    }
+
+    [SerializeField] private int currentTierLayer;
+    private void MyConformToMagnetoLevel(sbyte level)
+    {
+        for (int i = 0; i < metalObjects.Length; i++)
+        {
+            MetalObject metalObject = metalObjects[i];
+            if(metalObject.Tier <= level)
+            {
+                metalObject.gameObject.layer = currentTierLayer;
+                int childCount = metalObject.transform.childCount;
+                for (int j = 0; j < childCount; j++)
+                {
+                    metalObject.transform.GetChild(j).gameObject.layer = currentTierLayer;
+                }
             }
         }
     }
@@ -104,6 +173,7 @@ public class MagnetManager : MonoBehaviour
             }
         }     
     }
+
 
     [SerializeField] private Magneto magneto;
     [SerializeField] private float MagnetsForceAgainstMagnetoMultiplier=3f;
