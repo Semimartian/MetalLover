@@ -26,12 +26,15 @@ public class MagnetManager : MonoBehaviour
         public float mass;
     }
 
-   [SerializeField] private MetalObjectProperties[] metalObjectPropertiesByTiers;
-
+    [SerializeField] private MetalObjectProperties[] metalObjectPropertiesByTiers;
     private MetalObject[] metalObjects;
     //[SerializeField] private Transform magnet;
     private Magnet[] magnets;
     [SerializeField] private MagnetDistortion MagnetDistortionPreFab;
+
+    [SerializeField]
+    private bool metalObjectsToAttractMagneto;
+
 
     void Start()
     {
@@ -137,7 +140,7 @@ public class MagnetManager : MonoBehaviour
         sbyte magnetoLevel = magneto.CurrentMagnetoLevelIndex;
         for (int j = 0; j < magnets.Length; j++)
         {
-            bool isMagneto = magnets[j] == magneto;
+            bool isMagneto = metalObjectsToAttractMagneto &&( magnets[j] == magneto);
             Attraction magnetAttraction = magnets[j].AttractionField;
             Bounds bounds = new Bounds
                 (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
