@@ -5,12 +5,12 @@ using UnityEngine;
 public class Shell : MonoBehaviour
 {
     [SerializeField] private Transform target;
-    [SerializeField] private Rigidbody rigidbody;
+     public Rigidbody rigidbody;
 
-    private void FixedUpdate()
+   /* private void FixedUpdate()
     {
         rigidbody.MovePosition(target.position);
         rigidbody.MoveRotation(target.rotation);
-    }
+    }*/
 
 }

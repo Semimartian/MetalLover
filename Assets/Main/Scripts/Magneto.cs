@@ -64,7 +64,8 @@ public class Magneto : Magnet
     }
 
     [SerializeField] private Transform body;
-    [SerializeField] private Transform shell;
+    [SerializeField] private Shell shell;
+
 
     [SerializeField] private float scaleSpeed;
     private IEnumerator Scale()
@@ -74,7 +75,7 @@ public class Magneto : Magnet
         float previousMass = rigidbody.mass;
         float previousSize = body.localScale.x;
 
-        if (currentMagnetoLevelIndex > 0)
+       // if (currentMagnetoLevelIndex > 0)
         {
             //TODO: this whole logic thing is sloppyy
             float cameraScaler = scaleMultiplier / previousSize;
@@ -89,7 +90,7 @@ public class Magneto : Magnet
             yield return new WaitForFixedUpdate();
             Vector3 scaleAddition = Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
             body.localScale += scaleAddition;
-            shell.localScale += scaleAddition;
+            shell.transform.localScale += scaleAddition;
             {
                 float newMass = Mathf.Lerp(previousMass, magnetoLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
@@ -97,7 +98,9 @@ public class Magneto : Magnet
             }
         }
         body.localScale = Vector3.one * scaleMultiplier;
-        shell.localScale = Vector3.one * scaleMultiplier;
+        shell.transform.localScale = Vector3.one * scaleMultiplier;
+
+        centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
         rigidbody.mass = magnetoLevel.mass;
 
@@ -112,37 +115,84 @@ public class Magneto : Magnet
         }
     }
 
+
+    private static readonly float smallXRotaionClampValue = 60;
+    private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;
+    [SerializeField]
+    private Transform centreOfMassTransform ;
+    private Vector3 centreOfMass;
     private void FixedUpdate()
     {
          velocity = rigidbody.velocity.magnitude;
   
         //if (!attached)
-        {
-            float mouseMovement = Input.GetAxisRaw("Mouse X");
-            float deltaTime = Time.fixedDeltaTime;
-            if (mouseMovement != 0)
-            {
-                // Debug.Log("mouseMovement>0");
-                myTransform.Rotate(new Vector3
-                    (0, rotationPerSecond * mouseMovement * deltaTime, 0));
-            }
-            if (Input.GetMouseButton(0))
-            {
-                float speed = 
-                    ( magnetoLevel.speed + speedBoost);// * rigidbody.mass;//TODO: casche
-                rigidbody.AddForce
-                    (myTransform.forward * speed , ForceMode.Acceleration);
-                //myTransform.Translate(Vector3.forward * currentSpeed * deltaTime);
-            }
+        float mouseMovement = Input.GetAxisRaw("Mouse X");
+        float deltaTime = Time.fixedDeltaTime;
 
+        Quaternion currentRotationQurternion = rigidbody.rotation;
+        if (mouseMovement != 0)
+        {
+            /*myTransform.Rotate(new Vector3
+                (0, rotationPerSecond * mouseMovement * deltaTime, 0));*/
+
+            Vector3 currentRotation = currentRotationQurternion.eulerAngles;
+            currentRotation += new Vector3
+                (0, rotationPerSecond * mouseMovement * deltaTime, 0);
+            currentRotationQurternion = Quaternion.Euler(currentRotation);
+             rigidbody.rotation = currentRotationQurternion;
         }
 
-       /* float time = Time.time;
-        if (time > lastSpeedCheck + speedCheckInterval)
+        Vector3 Movement = new Vector3();
+        if (Input.GetMouseButton(0))
         {
-            UpdateSpeed();
-            lastSpeedCheck = time;
-        }*/
+            float speed = 
+                ( magnetoLevel.speed + speedBoost);// * rigidbody.mass;//TODO: casche
+            Movement = myTransform.forward * speed * deltaTime;
+            rigidbody.AddForce
+                (Movement, ForceMode.VelocityChange);
+
+            //myTransform.Translate(Vector3.forward * currentSpeed * deltaTime);
+        }
+        //Debug.Log("-----------");
+
+
+       // Quaternion currentRotationQurternion = rigidbody.rotation;
+       // Vector3 currentRotation = currentRotationQurternion.eulerAngles;// myTransform.eulerAngles;
+                                                                        //Debug.Log("angle x" + currentRotation.x);
+                                                                        //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
+
+        //rigidbody.angularVelocity = new Vector3()
+        // Debug.Log("angularVelocity" + angularVelocity);
+       /* Debug.Log("rigidbody.centerOfMass" + rigidbody.centerOfMass);
+
+        rigidbody.centerOfMass =  centreOfMassTransform.localPosition;*/
+
+        if (false)
+        {
+            /*if (currentRotation.x > smallXRotaionClampValue && currentRotation.x < largeXRotaionClampValue)
+            {
+                Vector3 angularVelocity = rigidbody.angularVelocity;
+                rigidbody.angularVelocity = new Vector3(0, angularVelocity.y, angularVelocity.z);
+                Debug.Log("angle x" + currentRotation.x);*/
+                /*currentRotation.x = smallXRotaionClampValue;
+                currentRotationQurternion = Quaternion.Euler(currentRotation);*/
+                // rigidbody.MoveRotation(currentRotationQurternion);
+
+           // }
+            //Debug.Log("angle x" + currentRotation.x);
+        }
+
+
+
+        /* float time = Time.time;
+         if (time > lastSpeedCheck + speedCheckInterval)
+         {
+             UpdateSpeed();
+             lastSpeedCheck = time;
+         }*/
+
+        shell.rigidbody.MovePosition(rigidbody.position + (Movement*0.2f));
+        shell.rigidbody.MoveRotation(currentRotationQurternion);
     }
 
   
