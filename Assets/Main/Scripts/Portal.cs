@@ -15,4 +15,9 @@ public class Portal : MonoBehaviour
     {
         isActive = false;
     }
+
+    private void Start()
+    {
+        GetComponent<MeshRenderer>().enabled = false;
+    }
 }

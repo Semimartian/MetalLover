@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using cakeslice;
 
 public class MagnetManager : MonoBehaviour
 {
@@ -24,6 +25,8 @@ public class MagnetManager : MonoBehaviour
     {
         public float attraction;
         public float mass;
+        public float drag;
+        public float angularDrag;
     }
 
     [SerializeField] private MetalObjectProperties[] metalObjectPropertiesByTiers;
@@ -66,8 +69,10 @@ public class MagnetManager : MonoBehaviour
             metalObject.transform.localScale = Vector3.one;
             ref MetalObjectProperties properties =ref metalObjectPropertiesByTiers[metalObject.Tier];
             metalObject.rigidbody.mass = properties.mass;
+            metalObject.rigidbody.drag = properties.drag;
+            metalObject.rigidbody.angularDrag = properties.angularDrag;
             metalObject.attractionForce = properties.attraction;
-           Collider[] colliders= metalObject.GetComponentsInChildren<Collider>();
+            Collider[] colliders= metalObject.GetComponentsInChildren<Collider>();
             for (int j = 0; j < colliders.Length; j++)
             {
                 colliders[j].material = metalPhysicsMat;
@@ -122,8 +127,10 @@ public class MagnetManager : MonoBehaviour
         for (int i = 0; i < metalObjects.Length; i++)
         {
             MetalObject metalObject = metalObjects[i];
-            if(metalObject.Tier <= level)
+            int outlineIndex = 1;
+            if (metalObject.Tier <= level)
             {
+                outlineIndex = 0;
                 metalObject.gameObject.layer = currentTierLayer;
                 int childCount = metalObject.transform.childCount;
                 for (int j = 0; j < childCount; j++)
@@ -131,6 +138,37 @@ public class MagnetManager : MonoBehaviour
                     metalObject.transform.GetChild(j).gameObject.layer = currentTierLayer;
                 }
             }
+
+            ModifyOutline(metalObject.transform, outlineIndex);
+        }
+    }
+
+    /*private void InfiniteLoop()
+    {
+        InfiniteLoop();
+    }*/
+
+    private void ModifyOutline(Transform t, int outlineIndex)
+    {
+
+        MeshRenderer meshRenderer = t.GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+            Outline outline = t.GetComponent<Outline>();
+            if (outline == null)
+            {
+                outline = t.gameObject.AddComponent<Outline>();
+            }
+            outline.color = outlineIndex;
+        }
+
+        for (int j = 0; j < t.childCount; j++)
+        {
+            Transform child = t.GetChild(j);
+            if (child.gameObject.activeSelf)
+            {
+                ModifyOutline(child, outlineIndex);
+            }          
         }
     }
 
