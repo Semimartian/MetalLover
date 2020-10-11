@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2605927892835533459}
   - component: {fileID: 2605927892835533471}
   - component: {fileID: 2605927892835533456}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Magneto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53,17 +53,45 @@ MonoBehaviour:
     centre: {fileID: 0}
     radius: 0
     force: 0
-  magnetoLevels: []
+  magnetoLevels:
+  - sizeMultiplier: 1
+    mass: 3
+    speed: 13
+    attractionField:
+      centre: {fileID: 4927659228536006277}
+      radius: 2
+      force: 20
+  - sizeMultiplier: 2.5
+    mass: 12
+    speed: 20
+    attractionField:
+      centre: {fileID: 4927659228536006277}
+      radius: 5
+      force: 320
+  - sizeMultiplier: 6
+    mass: 333
+    speed: 24
+    attractionField:
+      centre: {fileID: 4927659228536006277}
+      radius: 8
+      force: 1500
+  - sizeMultiplier: 8
+    mass: 40
+    speed: 28
+    attractionField:
+      centre: {fileID: 4927659228536006277}
+      radius: 8
+      force: 1200
   currentMagnetoLevelIndex: 0
   rotationPerSecond: 160
-  defaultSpeed: 23000
+  defaultSpeed: 18
   velocity: 0
   debugText: {fileID: 0}
   camera: {fileID: 0}
-  body: {fileID: 0}
+  body: {fileID: 3838454777394022116}
   shell: {fileID: 0}
-  scaleSpeed: 0
-  centreOfMassTransform: {fileID: 2605927892835533459}
+  scaleSpeed: 0.8
+  centreOfMassTransform: {fileID: 508791925565305508}
   speedBoost: 0
 --- !u!54 &2605927892835533456
 Rigidbody:
@@ -75,11 +103,11 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 25
   m_Drag: 0.6
-  m_AngularDrag: 0
+  m_AngularDrag: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!1 &2605927893109970689
 GameObject:
@@ -90,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2605927893109970694}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CameraAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +156,7 @@ GameObject:
   - component: {fileID: 8354361906751529425}
   - component: {fileID: 354381426806022271}
   - component: {fileID: 4961100895889327156}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Magnet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -206,7 +234,7 @@ BoxCollider:
   m_GameObject: {fileID: 4918149402195601593}
   m_Material: {fileID: 13400000, guid: 17c96f84f2497eb4486b271644666dec, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.01, y: 0.00895047, z: 0.007872291}
   m_Center: {x: 0, y: 0.00068103423, z: -0.036579564}
@@ -219,7 +247,7 @@ BoxCollider:
   m_GameObject: {fileID: 4918149402195601593}
   m_Material: {fileID: 13400000, guid: 17c96f84f2497eb4486b271644666dec, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.010000001, y: 0.008684043, z: 0.008140404}
   m_Center: {x: 0, y: 0.0008142487, z: -0.013530297}
@@ -286,7 +314,7 @@ GameObject:
   - component: {fileID: 7396476317708442160}
   - component: {fileID: 5089075597604019646}
   - component: {fileID: 3757233313147804452}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Centre
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +393,7 @@ GameObject:
   - component: {fileID: 4927659228536006277}
   - component: {fileID: 1455173708023241143}
   - component: {fileID: 4718542344293434279}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AttractivePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -443,7 +471,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2932170825244084632}
   - component: {fileID: 5056556734074210200}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ReflectionProbe (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -508,14 +536,13 @@ GameObject:
   - component: {fileID: 508791925565305508}
   - component: {fileID: 6267899507393767096}
   - component: {fileID: 5892238390731610647}
-  - component: {fileID: 2727952334500952276}
   m_Layer: 0
   m_Name: CentreOfMass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &508791925565305508
 Transform:
   m_ObjectHideFlags: 0
@@ -524,7 +551,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7707900674417640639}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.06, z: -0.2}
+  m_LocalPosition: {x: 0, y: 0.035, z: -0.055}
   m_LocalScale: {x: 0.13297, y: 0.13297, z: 0.13297}
   m_Children: []
   m_Father: {fileID: 2605927892835533459}
@@ -577,19 +604,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &2727952334500952276
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7707900674417640639}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8517501509716499482
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,7 +617,7 @@ GameObject:
   - component: {fileID: 3830620744753867596}
   - component: {fileID: 6851960444281601756}
   - component: {fileID: 2019620517421055796}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BodyParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}

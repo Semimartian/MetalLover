@@ -49,7 +49,14 @@ public class MainCamera : MonoBehaviour
     {
         myTransform = transform;
     }
-
+    [SerializeField] private cakeslice.OutlineEffect outlineEffect;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            outlineEffect.enabled = !outlineEffect.enabled;
+        }
+    }
     // Update is called once per frame
     void FixedUpdate()
     {

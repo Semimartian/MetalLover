@@ -121,25 +121,28 @@ public class MagnetManager : MonoBehaviour
         instance.MyConformToMagnetoLevel(level);
     }
 
+    [SerializeField] private int higherTierLayer;
     [SerializeField] private int currentTierLayer;
     private void MyConformToMagnetoLevel(sbyte level)
     {
         for (int i = 0; i < metalObjects.Length; i++)
         {
             MetalObject metalObject = metalObjects[i];
-            int outlineIndex = 1;
+            int outlineIndex;
+            int physicsLayer;
+
             if (metalObject.Tier <= level)
             {
                 outlineIndex = 0;
-                metalObject.gameObject.layer = currentTierLayer;
-                int childCount = metalObject.transform.childCount;
-                for (int j = 0; j < childCount; j++)
-                {
-                    metalObject.transform.GetChild(j).gameObject.layer = currentTierLayer;
-                }
+                physicsLayer = currentTierLayer;
+            }
+            else
+            {
+                outlineIndex = 1;
+                physicsLayer = higherTierLayer;
             }
 
-            ModifyOutline(metalObject.transform, outlineIndex);
+            ModifyMetalObject(metalObject.transform, outlineIndex, physicsLayer);
         }
     }
 
@@ -148,9 +151,9 @@ public class MagnetManager : MonoBehaviour
         InfiniteLoop();
     }*/
 
-    private void ModifyOutline(Transform t, int outlineIndex)
+    private void ModifyMetalObject(Transform t, int outlineIndex, int physicsLayer )
     {
-
+        t.gameObject.layer = physicsLayer;
         MeshRenderer meshRenderer = t.GetComponent<MeshRenderer>();
         if (meshRenderer != null)
         {
@@ -167,7 +170,7 @@ public class MagnetManager : MonoBehaviour
             Transform child = t.GetChild(j);
             if (child.gameObject.activeSelf)
             {
-                ModifyOutline(child, outlineIndex);
+                ModifyMetalObject(child, outlineIndex, physicsLayer);
             }          
         }
     }
