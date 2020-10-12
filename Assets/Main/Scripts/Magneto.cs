@@ -25,7 +25,7 @@ public class Magneto : Magnet
     }
 
     [SerializeField] private sbyte currentMagnetoLevelIndex = 0;
-    public sbyte CurrentMagnetoLevelIndex => currentMagnetoLevelIndex;
+    //public sbyte CurrentMagnetoLevelIndex => currentMagnetoLevelIndex;
     private Transform myTransform;
 
     [SerializeField] float rotationPerSecond;
@@ -44,23 +44,24 @@ public class Magneto : Magnet
     {
         base.Initialise();
         myTransform = transform;
-        ConformToMagnetoLevel();
+
+        magnetoLevel = magnetoLevels[0];
+
+        ConformToMagnetoLevel(0,3);
         InvokeRepeating("UpdateDebugText", 1, 0.2f);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;              
     }
 
-    private void ConformToMagnetoLevel()
+    private void ConformToMagnetoLevel(sbyte newLevelIndex,float waitTime)
     {
-        magnetoLevel = magnetoLevels[currentMagnetoLevelIndex];
-        if(currentMagnetoLevelIndex>= magnetoLevels.Length)
+        if(newLevelIndex >= magnetoLevels.Length)
         {
             Debug.LogError("currentMagnetoLevelIndex>= magnetoLevels.Length!");
             return;
         }
         //MagnetoLevel magnetoLevel = magnetoLevels[currentMagnetoLevelIndex];
-        StartCoroutine(Scale());
-        MagnetManager.ConformToMagnetoLevel(currentMagnetoLevelIndex);
+        StartCoroutine(Scale(newLevelIndex, waitTime));
     }
 
     [SerializeField] private Transform body;
@@ -68,10 +69,10 @@ public class Magneto : Magnet
 
 
     [SerializeField] private float scaleSpeed;
-    private IEnumerator Scale()
+    private IEnumerator Scale(sbyte newLevelIndex, float waitTime)
     {
-
-        float scaleMultiplier = magnetoLevel.sizeMultiplier;
+        MagnetoLevel nextLevel = magnetoLevels[newLevelIndex];
+        float scaleMultiplier = nextLevel.sizeMultiplier;
         float previousMass = rigidbody.mass;
         float previousSize = body.localScale.x;
 
@@ -92,7 +93,7 @@ public class Magneto : Magnet
             body.localScale += scaleAddition;
             shell.transform.localScale += scaleAddition;
             {
-                float newMass = Mathf.Lerp(previousMass, magnetoLevel.mass,
+                float newMass = Mathf.Lerp(previousMass, nextLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
                 rigidbody.mass = newMass;
             }
@@ -102,7 +103,12 @@ public class Magneto : Magnet
 
         centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
-        rigidbody.mass = magnetoLevel.mass;
+        rigidbody.mass = nextLevel.mass;
+
+        magnetoLevel = nextLevel;
+
+        MagnetManager.ConformToMagnetoLevel(newLevelIndex, waitTime);
+        currentMagnetoLevelIndex = newLevelIndex;
 
     }
 
@@ -111,7 +117,7 @@ public class Magneto : Magnet
         if (Input.GetKeyDown(KeyCode.S))
         {
             currentMagnetoLevelIndex++;
-            ConformToMagnetoLevel();
+            ConformToMagnetoLevel((sbyte)(currentMagnetoLevelIndex + 1),0);
         }
     }
 
@@ -191,7 +197,7 @@ public class Magneto : Magnet
              lastSpeedCheck = time;
          }*/
 
-        shell.rigidbody.MovePosition(rigidbody.position + (Movement*0.2f));
+        shell.rigidbody.MovePosition(rigidbody.position + (Movement*0.1f));
         shell.rigidbody.MoveRotation(currentRotationQurternion);
     }
 
@@ -220,8 +226,7 @@ public class Magneto : Magnet
                 {
                     Debug.Log("portal" + Time.frameCount);
                     portal.Expire();
-                    currentMagnetoLevelIndex++;
-                    ConformToMagnetoLevel();
+                    ConformToMagnetoLevel((sbyte)(currentMagnetoLevelIndex + 1),0);
                 }
             }
         }

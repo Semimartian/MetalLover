@@ -26,13 +26,12 @@ public class MagnetManager : MonoBehaviour
     {
         public float attraction;
         public float mass;
-        public float drag;
-        public float angularDrag;
-    }
 
+    }
+    [SerializeField] private float metalObjectsDrag;
+    [SerializeField] private float metalObjectsAngularDrag;
     [SerializeField] private MetalObjectProperties[] metalObjectPropertiesByTiers;
     private MetalObject[] metalObjects;
-    //[SerializeField] private Transform magnet;
     private Magnet[] magnets;
     [SerializeField] private MagnetDistortion MagnetDistortionPreFab;
 
@@ -50,6 +49,10 @@ public class MagnetManager : MonoBehaviour
         }
         CreateMagnetDistortions();
         InitailaiseMetalObjects();
+
+        Debug.Log(Vector3.one.magnitude);
+        Debug.Log((Vector3.one * 2).magnitude);
+
     }
 
     private void CreateMagnetDistortions()
@@ -70,8 +73,8 @@ public class MagnetManager : MonoBehaviour
             metalObject.transform.localScale = Vector3.one;
             ref MetalObjectProperties properties =ref metalObjectPropertiesByTiers[metalObject.Tier];
             metalObject.rigidbody.mass = properties.mass;
-            metalObject.rigidbody.drag = properties.drag;
-            metalObject.rigidbody.angularDrag = properties.angularDrag;
+            metalObject.rigidbody.drag = metalObjectsDrag;
+            metalObject.rigidbody.angularDrag = metalObjectsAngularDrag;
             metalObject.attractionForce = properties.attraction;
             Collider[] colliders= metalObject.GetComponentsInChildren<Collider>();
             for (int j = 0; j < colliders.Length; j++)
@@ -120,14 +123,15 @@ public class MagnetManager : MonoBehaviour
         
     }
     #endregion
-    public static void ConformToMagnetoLevel(sbyte level)
+    public static void ConformToMagnetoLevel(sbyte level, float waitTime)
     {
-        instance.MyConformToMagnetoLevel(level);
+        MagnetoLevelIndex = level;
+        instance.Invoke("MyConformToMagnetoLevel", waitTime);
     }
-
+    private static sbyte MagnetoLevelIndex;
     [SerializeField] private int higherTierLayer;
     [SerializeField] private int currentTierLayer;
-    private void MyConformToMagnetoLevel(sbyte level)
+    private void MyConformToMagnetoLevel()
     {
         for (int i = 0; i < metalObjects.Length; i++)
         {
@@ -135,13 +139,25 @@ public class MagnetManager : MonoBehaviour
             int outlineIndex;
             int physicsLayer;
 
-            if (metalObject.Tier <= level)
+            if (metalObject.Tier <= MagnetoLevelIndex)
             {
+                if (metalObject.rigidbody != null)
+                {
+                    metalObject.rigidbody.isKinematic = false;
+                    metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+                }
                 outlineIndex = 0;
                 physicsLayer = currentTierLayer;
             }
             else
             {
+                if (metalObject.rigidbody != null)
+                {
+                    metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                    metalObject.rigidbody.isKinematic = true;
+
+                }
                 outlineIndex = 1;
                 physicsLayer = higherTierLayer;
             }
@@ -198,10 +214,10 @@ public class MagnetManager : MonoBehaviour
     }
 
     private float boundsExpansion = 3f;
-    private float permenantAttachmentRadiusDevider = 14;
+    private float permenantAttachmentRadiusDevider = 15;
     private void ManageMetalObjects(/*float deltaTime*/)
     {
-        sbyte magnetoLevel = magneto.CurrentMagnetoLevelIndex;
+        sbyte magnetoLevel = MagnetoLevelIndex;
         for (int j = 0; j < magnets.Length; j++)
         {
             bool isMagneto = /*metalObjectsToAttractMagneto &&*/( magnets[j] == magneto);
@@ -214,14 +230,12 @@ public class MagnetManager : MonoBehaviour
             for (int i = 0; i < metalObjects.Length; i++)
             {
                 MetalObject metalObject = metalObjects[i];
-                if (metalObject.permenantlyAttatched)
+                if (metalObject.permenantlyAttatched || metalObject.Tier > magnetoLevel)
                 {
                     continue;
                 }
                 //if (!metalObject.IsAttachedTo(magnets[j]))
                 {
-
-
                     Transform metalObjectTransform = metalObject.transform;
                     Vector3 metalObjectPosition = metalObjectTransform.position;
                     if (!bounds.Contains(metalObjectPosition))
@@ -234,8 +248,9 @@ public class MagnetManager : MonoBehaviour
                   {
                        // Debug.Log("distanceFromMagnet" + distanceFromMagnet);
                         float attractionSpeed =
-                          (Mathf.Abs(distanceFromMagnet - magnetAttractionDistance) / magnetAttractionDistance) 
-                          * magnetAttraction.force;
+                           (Mathf.Abs(distanceFromMagnet - magnetAttractionDistance) / magnetAttractionDistance) 
+                           * magnetAttraction.force;
+                        #region old but might come back:
                         /*if (metalObject.IsAttachedToSomeMagnet())
                         {
                             if(attractionSpeed> metalObject.attraction)
@@ -247,13 +262,11 @@ public class MagnetManager : MonoBehaviour
                                 continue;
                             }
                         }*/
-
-                        metalObject.rigidbody.AddForce
-                          ((magnetAttraction.centre.position - metalObjectPosition).normalized
-                          * (attractionSpeed /** deltaTime*/),ForceMode.Force);
+                        #endregion
+                        bool attract = true;
                         if (isMagneto)// && magnetoLevel < metalObject.Tier)
                         {
-                            if(magnetoLevel < metalObject.Tier)
+                            if( false && magnetoLevel < metalObject.Tier)
                             {
                                 if (metalObjectsToAttractMagneto )
                                 {
@@ -267,9 +280,16 @@ public class MagnetManager : MonoBehaviour
                                 if(distanceFromMagnet < magnetAttraction.radius / permenantAttachmentRadiusDevider)
                                 {
                                     AttatchPermenantly(metalObject,magneto);
-
+                                    attract = false;
                                 }
                             }
+                        }
+
+                        if (attract)
+                        {
+                            metalObject.rigidbody.AddForce
+                          ((magnetAttraction.centre.position - metalObjectPosition).normalized
+                          * (attractionSpeed /** deltaTime*/), ForceMode.Force);
                         }
                   }
                 }
