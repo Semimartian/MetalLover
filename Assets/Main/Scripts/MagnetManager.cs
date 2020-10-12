@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using cakeslice;
+using System;
 
 public class MagnetManager : MonoBehaviour
 {
@@ -111,6 +112,9 @@ public class MagnetManager : MonoBehaviour
 
             Gizmos.DrawWireCube
                 (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
+
+            Gizmos.DrawWireSphere
+               (magnetAttraction.centre.position, (magnetAttraction.radius / permenantAttachmentRadiusDevider));
         }
 
         
@@ -175,13 +179,32 @@ public class MagnetManager : MonoBehaviour
         }
     }
 
+    private void RemoveCollidersFrom(Transform t)
+    {
+        Collider[] colliders = t.GetComponents<Collider>();
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Destroy(colliders[i]);
+        }
+
+        for (int j = 0; j < t.childCount; j++)
+        {
+            Transform child = t.GetChild(j);
+            if (child.gameObject.activeSelf)
+            {
+                RemoveCollidersFrom(child);
+            }
+        }
+    }
+
     private float boundsExpansion = 3f;
+    private float permenantAttachmentRadiusDevider = 14;
     private void ManageMetalObjects(/*float deltaTime*/)
     {
         sbyte magnetoLevel = magneto.CurrentMagnetoLevelIndex;
         for (int j = 0; j < magnets.Length; j++)
         {
-            bool isMagneto = metalObjectsToAttractMagneto &&( magnets[j] == magneto);
+            bool isMagneto = /*metalObjectsToAttractMagneto &&*/( magnets[j] == magneto);
             Attraction magnetAttraction = magnets[j].AttractionField;
             Bounds bounds = new Bounds
                 (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
@@ -191,11 +214,15 @@ public class MagnetManager : MonoBehaviour
             for (int i = 0; i < metalObjects.Length; i++)
             {
                 MetalObject metalObject = metalObjects[i];
+                if (metalObject.permenantlyAttatched)
+                {
+                    continue;
+                }
                 //if (!metalObject.IsAttachedTo(magnets[j]))
                 {
 
 
-                        Transform metalObjectTransform = metalObject.transform;
+                    Transform metalObjectTransform = metalObject.transform;
                     Vector3 metalObjectPosition = metalObjectTransform.position;
                     if (!bounds.Contains(metalObjectPosition))
                     {
@@ -224,11 +251,25 @@ public class MagnetManager : MonoBehaviour
                         metalObject.rigidbody.AddForce
                           ((magnetAttraction.centre.position - metalObjectPosition).normalized
                           * (attractionSpeed /** deltaTime*/),ForceMode.Force);
-                        if (isMagneto && magnetoLevel < metalObject.Tier)
+                        if (isMagneto)// && magnetoLevel < metalObject.Tier)
                         {
-                            magneto.AddForce
-                                ((metalObjectPosition - magnetAttraction.centre.position ).normalized
-                                * (metalObject.attractionForce /** deltaTime*/), ForceMode.Force);
+                            if(magnetoLevel < metalObject.Tier)
+                            {
+                                if (metalObjectsToAttractMagneto )
+                                {
+                                    magneto.AddForce
+                                    ((metalObjectPosition - magnetAttraction.centre.position).normalized
+                                    * (metalObject.attractionForce /** deltaTime*/), ForceMode.Force);
+                                }
+                            }
+                            else if (magnetoLevel > metalObject.Tier)
+                            {
+                                if(distanceFromMagnet < magnetAttraction.radius / permenantAttachmentRadiusDevider)
+                                {
+                                    AttatchPermenantly(metalObject,magneto);
+
+                                }
+                            }
                         }
                   }
                 }
@@ -236,6 +277,15 @@ public class MagnetManager : MonoBehaviour
         }     
     }
 
+    private void AttatchPermenantly(MetalObject metalObject, Magnet magnet)
+    {
+        metalObject.rigidbody.velocity = Vector3.zero;
+        metalObject.permenantlyAttatched = true;
+        Destroy(metalObject.rigidbody);
+        RemoveCollidersFrom(metalObject.transform);
+
+        metalObject.transform.parent = magnet.transform;
+    }
 
     [SerializeField] private Magneto magneto;
     [SerializeField] private float MagnetsForceAgainstMagnetoMultiplier=3f;

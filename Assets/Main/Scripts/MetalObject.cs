@@ -9,6 +9,8 @@ public class MetalObject : MonoBehaviour
     public Rigidbody rigidbody;
     public float attractionForce;
     [SerializeField] private sbyte tier;
+
+    public bool permenantlyAttatched = false;
     public sbyte Tier
     {
         get { return tier; }
