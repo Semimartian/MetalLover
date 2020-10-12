@@ -1344,7 +1344,7 @@ GameObject:
   - component: {fileID: 8369870933135269229}
   - component: {fileID: 8369870933135269230}
   m_Layer: 0
-  m_Name: Tier5Proto 1
+  m_Name: MO_2_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1380,7 +1380,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 8369870933135269230}
   attractionForce: 5000
-  tier: 4
+  tier: 2
+  permenantlyAttatched: 0
 --- !u!54 &8369870933135269230
 Rigidbody:
   m_ObjectHideFlags: 0
