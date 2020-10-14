@@ -55,6 +55,8 @@ public class MagnetManager : MonoBehaviour
 
     }
 
+
+
     private void CreateMagnetDistortions()
     {
         for (int i = 0; i < magnets.Length; i++)
@@ -75,7 +77,7 @@ public class MagnetManager : MonoBehaviour
             metalObject.rigidbody.mass = properties.mass;
             metalObject.rigidbody.drag = metalObjectsDrag;
             metalObject.rigidbody.angularDrag = metalObjectsAngularDrag;
-            metalObject.attractionForce = properties.attraction;
+            //metalObject.attractionForce = properties.attraction;
             Collider[] colliders= metalObject.GetComponentsInChildren<Collider>();
             for (int j = 0; j < colliders.Length; j++)
             {
@@ -88,7 +90,7 @@ public class MagnetManager : MonoBehaviour
     {
        // float deltaTime = Time.deltaTime;
         ManageMetalObjects();
-        ManageMagnetoAgainstMagnets();
+       // ManageMagnetoAgainstMagnets();
 
     }
 
@@ -128,41 +130,47 @@ public class MagnetManager : MonoBehaviour
         MagnetoLevelIndex = level;
         instance.Invoke("MyConformToMagnetoLevel", waitTime);
     }
+
     private static sbyte MagnetoLevelIndex;
     [SerializeField] private int higherTierLayer;
     [SerializeField] private int currentTierLayer;
+
+
     private void MyConformToMagnetoLevel()
     {
         for (int i = 0; i < metalObjects.Length; i++)
         {
             MetalObject metalObject = metalObjects[i];
-            int outlineIndex;
-            int physicsLayer;
-
-            if (metalObject.Tier <= MagnetoLevelIndex)
+            if (!metalObject.permenantlyAttatched)
             {
-                if (metalObject.rigidbody != null)
+                int outlineIndex;
+                int physicsLayer;
+
+                if (metalObject.Tier <= MagnetoLevelIndex)
                 {
-                    metalObject.rigidbody.isKinematic = false;
-                    metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+                    if (metalObject.rigidbody != null)
+                    {
+                        metalObject.rigidbody.isKinematic = false;
+                        metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
+                    }
+                    outlineIndex = 0;
+                    physicsLayer = currentTierLayer;
                 }
-                outlineIndex = 0;
-                physicsLayer = currentTierLayer;
-            }
-            else
-            {
-                if (metalObject.rigidbody != null)
+                else
                 {
-                    metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-                    metalObject.rigidbody.isKinematic = true;
+                    if (metalObject.rigidbody != null)
+                    {
+                        metalObject.rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                        metalObject.rigidbody.isKinematic = true;
 
+                    }
+                    outlineIndex = 1;
+                    physicsLayer = higherTierLayer;
                 }
-                outlineIndex = 1;
-                physicsLayer = higherTierLayer;
-            }
 
-            ModifyMetalObject(metalObject.transform, outlineIndex, physicsLayer);
+                ModifyMetalObject(metalObject.transform, outlineIndex, physicsLayer);
+            }      
         }
     }
 
@@ -170,6 +178,20 @@ public class MagnetManager : MonoBehaviour
     {
         InfiniteLoop();
     }*/
+
+    private static void ModifyPhysicsLayerOf(Transform t,  int physicsLayer)
+    {
+        t.gameObject.layer = physicsLayer;    
+
+        for (int j = 0; j < t.childCount; j++)
+        {
+            Transform child = t.GetChild(j);
+            if (child.gameObject.activeSelf)
+            {
+                ModifyPhysicsLayerOf(child, physicsLayer);
+            }
+        }
+    }
 
     private void ModifyMetalObject(Transform t, int outlineIndex, int physicsLayer )
     {
@@ -262,39 +284,63 @@ public class MagnetManager : MonoBehaviour
                                 continue;
                             }
                         }*/
-                        #endregion
-                        bool attract = true;
-                        if (isMagneto)// && magnetoLevel < metalObject.Tier)
+
+
+
+                        // bool attract = true;
+                        //if ( false && isMagneto)// && magnetoLevel < metalObject.Tier)
                         {
-                            if( false && magnetoLevel < metalObject.Tier)
-                            {
-                                if (metalObjectsToAttractMagneto )
-                                {
-                                    magneto.AddForce
-                                    ((metalObjectPosition - magnetAttraction.centre.position).normalized
-                                    * (metalObject.attractionForce /** deltaTime*/), ForceMode.Force);
-                                }
-                            }
-                            else if (magnetoLevel > metalObject.Tier)
-                            {
-                                if(distanceFromMagnet < magnetAttraction.radius / permenantAttachmentRadiusDevider)
-                                {
-                                    AttatchPermenantly(metalObject,magneto);
-                                    attract = false;
-                                }
-                            }
+                            /* if( false && magnetoLevel < metalObject.Tier)
+                             {
+                                 if (metalObjectsToAttractMagneto )
+                                 {
+                                     magneto.AddForce
+                                     ((metalObjectPosition - magnetAttraction.centre.position).normalized
+                                     * (metalObject.attractionForce /** deltaTime), ForceMode.Force);
+                                 }
+                             }
+                             else *//*if (magnetoLevel > metalObject.Tier)
+                             {
+                                 if(distanceFromMagnet < magnetAttraction.radius / permenantAttachmentRadiusDevider)
+                                 {
+                                     AttatchPermenantly(metalObject,magneto);
+                                     attract = false;
+                                 }
+                             }*/
                         }
 
-                        if (attract)
+                        // if (attract)
+                        #endregion
+
                         {
                             metalObject.rigidbody.AddForce
-                          ((magnetAttraction.centre.position - metalObjectPosition).normalized
-                          * (attractionSpeed /** deltaTime*/), ForceMode.Force);
+                              ((magnetAttraction.centre.position - metalObjectPosition).normalized
+                              * (attractionSpeed /** deltaTime*/), ForceMode.Force);
+
+
                         }
                   }
                 }
             }
         }     
+    }
+
+    private const int MAGNETO_LAYER = 8;
+    private const int MAGNETO_SHELL_LAYER = 9;
+    public static void AttachToMagnetoShell(MetalObject metalObject, Vector3 point)
+    {
+        Transform metalObjectTransform = metalObject.transform;
+        Rigidbody metalObjectRigidbody =  metalObject.rigidbody;
+        metalObjectRigidbody.velocity = Vector3.zero;
+        Destroy(metalObjectRigidbody);
+
+        metalObjectTransform.position = point;// metalObjectRigidbody.position;
+
+        ModifyPhysicsLayerOf(metalObjectTransform, MAGNETO_SHELL_LAYER);
+
+        metalObjectTransform.parent = instance.magnetoShellTransform;
+
+        metalObject.permenantlyAttatched = true;
     }
 
     private void AttatchPermenantly(MetalObject metalObject, Magnet magnet)
@@ -307,6 +353,7 @@ public class MagnetManager : MonoBehaviour
         metalObject.transform.parent = magnet.transform;
     }
 
+    [SerializeField] private Transform magnetoShellTransform;
     [SerializeField] private Magneto magneto;
     [SerializeField] private float MagnetsForceAgainstMagnetoMultiplier=3f;
 

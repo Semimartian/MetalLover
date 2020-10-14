@@ -55,33 +55,26 @@ MonoBehaviour:
     force: 0
   magnetoLevels:
   - sizeMultiplier: 1
-    mass: 3
+    mass: 1
     speed: 13
     attractionField:
       centre: {fileID: 4927659228536006277}
       radius: 2
-      force: 20
-  - sizeMultiplier: 2.5
+      force: 40
+  - sizeMultiplier: 7
     mass: 12
-    speed: 20
+    speed: 32
     attractionField:
       centre: {fileID: 4927659228536006277}
-      radius: 5
-      force: 320
-  - sizeMultiplier: 6
+      radius: 14
+      force: 3000
+  - sizeMultiplier: 18
     mass: 333
-    speed: 24
+    speed: 50
     attractionField:
       centre: {fileID: 4927659228536006277}
-      radius: 8
-      force: 1500
-  - sizeMultiplier: 8
-    mass: 40
-    speed: 28
-    attractionField:
-      centre: {fileID: 4927659228536006277}
-      radius: 8
-      force: 1200
+      radius: 36
+      force: 55001
   currentMagnetoLevelIndex: 0
   rotationPerSecond: 160
   defaultSpeed: 18
@@ -89,8 +82,9 @@ MonoBehaviour:
   debugText: {fileID: 0}
   camera: {fileID: 0}
   body: {fileID: 3838454777394022116}
+  shellBody: {fileID: 0}
   shell: {fileID: 0}
-  scaleSpeed: 0.8
+  scaleSpeed: 1
   centreOfMassTransform: {fileID: 508791925565305508}
   speedBoost: 0
 --- !u!54 &2605927892835533456
@@ -486,7 +480,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7054201137203595651}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.4000001, z: 0}
+  m_LocalPosition: {x: 0, y: 2.27, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2605927892835533459}
@@ -505,7 +499,7 @@ ReflectionProbe:
   m_Mode: 1
   m_RefreshMode: 1
   m_TimeSlicingMode: 0
-  m_Resolution: 64
+  m_Resolution: 128
   m_UpdateFrequency: 0
   m_BoxSize: {x: 32, y: 32.94719, z: 36}
   m_BoxOffset: {x: 0, y: 11.06, z: 9.16}
@@ -519,7 +513,7 @@ ReflectionProbe:
     m_Bits: 4294967295
   m_IntensityMultiplier: 1
   m_BlendDistance: 1
-  m_HDR: 1
+  m_HDR: 0
   m_BoxProjection: 0
   m_RenderDynamicObjects: 0
   m_UseOcclusionCulling: 1

@@ -65,6 +65,8 @@ public class Magneto : Magnet
     }
 
     [SerializeField] private Transform body;
+    [SerializeField] private Transform shellBody;
+
     [SerializeField] private Shell shell;
 
 
@@ -91,7 +93,7 @@ public class Magneto : Magnet
             yield return new WaitForFixedUpdate();
             Vector3 scaleAddition = Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
             body.localScale += scaleAddition;
-            shell.transform.localScale += scaleAddition;
+            shellBody.localScale += scaleAddition;
             {
                 float newMass = Mathf.Lerp(previousMass, nextLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
@@ -99,7 +101,7 @@ public class Magneto : Magnet
             }
         }
         body.localScale = Vector3.one * scaleMultiplier;
-        shell.transform.localScale = Vector3.one * scaleMultiplier;
+        shellBody.localScale = Vector3.one * scaleMultiplier;
 
         centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
