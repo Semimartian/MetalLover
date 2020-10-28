@@ -26,19 +26,24 @@ public class Magneto : Magnet
 
     [SerializeField] private sbyte currentMagnetoLevelIndex = 0;
     //public sbyte CurrentMagnetoLevelIndex => currentMagnetoLevelIndex;
-    private Transform myTransform;
+    [Header("Speeds:")]
 
     [SerializeField] float rotationPerSecond;
-    [SerializeField] float defaultSpeed;
+    [SerializeField] private float scaleSpeed;
+    private float speedBoost;
+
+    [Header("Related Objects:")]
+    private Transform myTransform;
+    [Header("Related Objects:")]
+    [SerializeField] private Transform body;
+    [SerializeField] private Transform shellBody;
+    [SerializeField] private Shell shell;
+    [SerializeField] private MainCamera camera;
+    [Header("Debugging")]
     [SerializeField] float velocity;
     [SerializeField] Text debugText;
-    [SerializeField] private MainCamera camera;
-
     //[SerializeField] private float currentBoostlessSpeed;
-
-    //[SerializeField] private float speedCheckInterval = 0.3f;
-   // [SerializeField] private int attachedObjects;
-
+    // [SerializeField] private int attachedObjects;
 
     public override void Initialise()
     {
@@ -47,7 +52,7 @@ public class Magneto : Magnet
 
         magnetoLevel = magnetoLevels[0];
 
-        ConformToMagnetoLevel(0,3);
+        ConformToMagnetoLevel(0,2);
         InvokeRepeating("UpdateDebugText", 1, 0.2f);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;              
@@ -64,13 +69,7 @@ public class Magneto : Magnet
         StartCoroutine(Scale(newLevelIndex, waitTime));
     }
 
-    [SerializeField] private Transform body;
-    [SerializeField] private Transform shellBody;
 
-    [SerializeField] private Shell shell;
-
-
-    [SerializeField] private float scaleSpeed;
     private IEnumerator Scale(sbyte newLevelIndex, float waitTime)
     {
         MagnetoLevel nextLevel = magnetoLevels[newLevelIndex];
@@ -78,6 +77,12 @@ public class Magneto : Magnet
         float previousMass = rigidbody.mass;
         float previousSize = body.localScale.x;
 
+
+        float blinkInterval = 0.06f;
+        float nextBlink = Time.time;
+
+        List<MeshRenderer> renderers = new List<MeshRenderer>();
+        renderers.AddRange(GetComponentsInChildren<MeshRenderer>());
        // if (currentMagnetoLevelIndex > 0)
         {
             //TODO: this whole logic thing is sloppyy
@@ -99,11 +104,21 @@ public class Magneto : Magnet
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
                 rigidbody.mass = newMass;
             }
+
+            //Blink:
+            if(nextBlink < Time.time )
+            {
+                nextBlink = Time.time + blinkInterval;
+                foreach (MeshRenderer renderer in renderers)
+                {
+                    renderer.enabled = !renderer.enabled;
+                }
+            }
         }
         body.localScale = Vector3.one * scaleMultiplier;
         shellBody.localScale = Vector3.one * scaleMultiplier;
 
-        centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
+        //centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
         rigidbody.mass = nextLevel.mass;
 
@@ -112,6 +127,11 @@ public class Magneto : Magnet
         MagnetManager.ConformToMagnetoLevel(newLevelIndex, waitTime);
         currentMagnetoLevelIndex = newLevelIndex;
 
+
+        foreach (MeshRenderer renderer in renderers)
+        {
+            renderer.enabled = true;
+        }
     }
 
     private void Update()
@@ -124,11 +144,10 @@ public class Magneto : Magnet
     }
 
 
-    private static readonly float smallXRotaionClampValue = 60;
-    private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;
-    [SerializeField]
-    private Transform centreOfMassTransform ;
-    private Vector3 centreOfMass;
+   /* private static readonly float smallXRotaionClampValue = 60;
+    private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;*/
+
+    //private Vector3 centreOfMass;
     private void FixedUpdate()
     {
          velocity = rigidbody.velocity.magnitude;
@@ -164,12 +183,12 @@ public class Magneto : Magnet
         //Debug.Log("-----------");
 
 
-       // Quaternion currentRotationQurternion = rigidbody.rotation;
-       // Vector3 currentRotation = currentRotationQurternion.eulerAngles;// myTransform.eulerAngles;
-                                                                        //Debug.Log("angle x" + currentRotation.x);
-                                                                        //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
+        // Quaternion currentRotationQurternion = rigidbody.rotation;
+        // Vector3 currentRotation = currentRotationQurternion.eulerAngles;// myTransform.eulerAngles;
+        //Debug.Log("angle x" + currentRotation.x);
+        //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
 
-        //rigidbody.angularVelocity = new Vector3()
+        rigidbody.angularVelocity = new Vector3();
         // Debug.Log("angularVelocity" + angularVelocity);
        /* Debug.Log("rigidbody.centerOfMass" + rigidbody.centerOfMass);
 
@@ -210,7 +229,6 @@ public class Magneto : Magnet
     }
 
     
-   [SerializeField] private float speedBoost;
 
     private void OnTriggerEnter(Collider other)
     {
