@@ -21,7 +21,7 @@ public class PhysicMatForcer : MonoBehaviour
     private void Modify(Transform t)
     {
         Collider collider = t.GetComponent<Collider>();
-        if(collider != null)
+        if (collider != null)
         {
             collider.material = physicMaterial;
         }
@@ -33,6 +33,27 @@ public class PhysicMatForcer : MonoBehaviour
             {
                 Modify(child);
             }
+        }
+    }
+
+
+    
+
+    private void MeFunc()
+    {
+        bool someBool = true;
+        if (someBool)
+        {
+            //Lets try type something
+         
+           // We are releaning how to type....
+          //Am I typing well???
+          //אני לומד להקליד עכשיו....
+          //..... אמממ מעניין כמה שגיאות אני עושה.....
+          // מה הוא גובה הישיבה הנכון????
+                     
+
+
         }
     }
 }

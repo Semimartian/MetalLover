@@ -22,7 +22,7 @@ public class MetalObject : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         int collisionLayer = collision.gameObject.layer;
-        if (collisionLayer == MAGNETO_SHELL_LAYER && collision.collider.gameObject.name == "Magnet")
+        if (collisionLayer == MAGNETO_SHELL_LAYER)// && collision.collider.gameObject.name == "Magnet")
         {
             SoundNames soundName;
             switch (tier)
@@ -75,6 +75,7 @@ public class MetalObject : MonoBehaviour
 
             MagnetManager.AttachToMagnetoShell(this, point);
 
+            GameManager.SpawnScoreFeedbackUI(point, tier);
         }
     }
     //public Magnet magnetAttached =null;

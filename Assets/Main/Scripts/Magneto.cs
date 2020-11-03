@@ -39,6 +39,7 @@ public class Magneto : Magnet
     [SerializeField] private Transform shellBody;
     [SerializeField] private Shell shell;
     [SerializeField] private MainCamera camera;
+    [SerializeField] private AudioSource ScaleAudioSource;
     [Header("Debugging")]
     [SerializeField] float velocity;
     [SerializeField] Text debugText;
@@ -72,6 +73,8 @@ public class Magneto : Magnet
 
     private IEnumerator Scale(sbyte newLevelIndex, float waitTime)
     {
+        ScaleAudioSource.Play();
+
         MagnetoLevel nextLevel = magnetoLevels[newLevelIndex];
         float scaleMultiplier = nextLevel.sizeMultiplier;
         float previousMass = rigidbody.mass;
@@ -99,6 +102,12 @@ public class Magneto : Magnet
             Vector3 scaleAddition = Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
             body.localScale += scaleAddition;
             shellBody.localScale += scaleAddition;
+
+            if (distortionEffect != null)
+            {
+                distortionEffect.transform.localScale += scaleAddition;   
+            }
+
             {
                 float newMass = Mathf.Lerp(previousMass, nextLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
@@ -115,8 +124,10 @@ public class Magneto : Magnet
                 }
             }
         }
-        body.localScale = Vector3.one * scaleMultiplier;
-        shellBody.localScale = Vector3.one * scaleMultiplier;
+
+        Vector3 scale = Vector3.one * scaleMultiplier;
+        body.localScale = scale;
+        shellBody.localScale = scale;
 
         //centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
@@ -132,17 +143,17 @@ public class Magneto : Magnet
         {
             renderer.enabled = true;
         }
+       /// RefreshDistortionEffect();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.M))
         {
             currentMagnetoLevelIndex++;
             ConformToMagnetoLevel((sbyte)(currentMagnetoLevelIndex + 1),0);
         }
     }
-
 
    /* private static readonly float smallXRotaionClampValue = 60;
     private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;*/
@@ -209,8 +220,6 @@ public class Magneto : Magnet
             //Debug.Log("angle x" + currentRotation.x);
         }
 
-
-
         /* float time = Time.time;
          if (time > lastSpeedCheck + speedCheckInterval)
          {
@@ -227,8 +236,6 @@ public class Magneto : Magnet
     {
         rigidbody.AddForce(force, mode);
     }
-
-    
 
     private void OnTriggerEnter(Collider other)
     {
@@ -268,5 +275,4 @@ public class Magneto : Magnet
         "Attached: " + attachedObjects*/;
     }
     //public float GetVelocity() => velocity;
-
 }

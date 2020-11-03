@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 330445794436225008}
   - component: {fileID: 8547535207662975239}
   - component: {fileID: 2742228636583264844}
+  - component: {fileID: 2820411847472384980}
   m_Layer: 5
   m_Name: ScoreFeedbackUI (1)
   m_TagString: Untagged
@@ -35,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 156.82, y: 50}
+  m_SizeDelta: {x: 156.82, y: 56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8547535207662975239
 CanvasRenderer:
@@ -92,14 +93,14 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 46
+  m_fontSizeBase: 46
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_textAlignment: 258
+  m_textAlignment: 514
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -156,6 +157,25 @@ MonoBehaviour:
   - {fileID: 0}
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!95 &2820411847472384980
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3299775924675929662}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9e5c02a5ed0e35249bdcccdfe4fa365a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &6759789377924186183
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,3 +225,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34b8dedd78885d2458da6c145da09c12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  text: {fileID: 2742228636583264844}
+  animator: {fileID: 2820411847472384980}

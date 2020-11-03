@@ -64,6 +64,8 @@ public class SoundManager : MonoBehaviour
     {
         if (delay > 0)
         {
+            Debug.LogWarning("delay > 0)");
+
             yield return new WaitForSeconds(delay);
         }
         CorrectedSoundClip clip = null;
@@ -106,6 +108,8 @@ public class SoundManager : MonoBehaviour
     {
         if (delay > 0)
         {
+            Debug.LogWarning("delay > 0)");
+
             yield return new WaitForSeconds(delay);
         }
         CorrectedSoundClip clip = null;

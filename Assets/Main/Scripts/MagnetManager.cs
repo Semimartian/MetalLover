@@ -62,7 +62,9 @@ public class MagnetManager : MonoBehaviour
         for (int i = 0; i < magnets.Length; i++)
         {
             MagnetDistortion distortion = Instantiate(MagnetDistortionPreFab);
-            distortion.Constructor(magnets[i].AttractionField.centre, magnets[i].AttractionField.radius);
+            magnets[i].distortionEffect = distortion;
+            magnets[i].RefreshDistortionEffect();
+            //distortion.Constructor(magnets[i]);
         }
     }
 
