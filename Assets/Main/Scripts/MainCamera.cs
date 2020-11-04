@@ -60,7 +60,7 @@ public class MainCamera : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(!goneToFinalDestination)
+        if(shouldFollow)
         {
             Vector3 targetPosition = lookAtTarget.position;
 
@@ -85,7 +85,12 @@ public class MainCamera : MonoBehaviour
         StartCoroutine(ScaleOffsetFromTargetCoroutine(by,2));
     }
 
-    private IEnumerator ScaleOffsetFromTargetCoroutine(float by,float seconds)
+    public void GoBack()
+    {
+        StartCoroutine(GoBackCoroutine());
+    }
+
+    private IEnumerator ScaleOffsetFromTargetCoroutine(float by, float seconds)
     {
         float timePassed = 0;
 
@@ -93,32 +98,46 @@ public class MainCamera : MonoBehaviour
         float fixedYTarget = movementProperties.fixedY * by;
         Vector3 offsetOrigin = movementProperties.positionOffsetFromTarget;
         Vector3 offsetTarget = movementProperties.positionOffsetFromTarget * by;
-       // bool shoudContinue = true;
-        while (timePassed<seconds)
+        // bool shoudContinue = true;
+        while (timePassed < seconds)
         {
             float t = timePassed / seconds;
 
             float byDelta = scaleSpeed * Time.fixedDeltaTime;
-            movementProperties.fixedY = Mathf.Lerp(fixedYOrigin,fixedYTarget,t) ;
+            movementProperties.fixedY = Mathf.Lerp(fixedYOrigin, fixedYTarget, t);
             movementProperties.positionOffsetFromTarget = Vector3.Lerp(offsetOrigin, offsetTarget, t);
 
             timePassed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
         Debug.Log("shoudContinue = false");
-       // movementProperties.positionOffsetFromTarget = target;
+        // movementProperties.positionOffsetFromTarget = target;
         movementProperties.fixedY = fixedYTarget;
         movementProperties.positionOffsetFromTarget = offsetTarget;
 
     }
 
-    private bool goneToFinalDestination = false;
+    private IEnumerator GoBackCoroutine()
+    {
+        shouldFollow = false;
+        Vector3 direction = -transform.forward;
+        float speed = 0.4f;
+
+        while (true)
+        {
+            transform.position += direction * speed * Time.deltaTime;
+            yield return null;
+        }
+
+    }
+
+    private bool shouldFollow = true;
     [SerializeField] Transform finalDestination;
     [SerializeField] private AnimationCurve finalDestinationCurve;
 
     public IEnumerator GoToFinalDestination()
     {
-        goneToFinalDestination = true;
+        shouldFollow = false;
 
         float time = 0;
         float endTime = finalDestinationCurve.keys[finalDestinationCurve.length - 1].time;
