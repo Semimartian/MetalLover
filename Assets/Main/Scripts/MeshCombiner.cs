@@ -17,16 +17,21 @@ public class MeshCombiner : MonoBehaviour
         List<CombineInstance> combineInstances = new List<CombineInstance>();
         for (int i = 0; i < transform.childCount; i++)
         {
+           
             Transform t = transform.GetChild(i);
-            MeshFilter meshFilter = t.GetComponent<MeshFilter>();
-            if (meshFilter != null)
+            if (t.gameObject.activeSelf)
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.mesh;
-                combineInstance.transform = t.localToWorldMatrix;
-                //combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-                combineInstances.Add(combineInstance);
+                MeshFilter meshFilter = t.GetComponent<MeshFilter>();
+                if (meshFilter != null)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = meshFilter.mesh;
+                    combineInstance.transform = t.localToWorldMatrix;
+                    //combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                    combineInstances.Add(combineInstance);
+                }
             }
+
             Destroy(t.gameObject);
         }
 

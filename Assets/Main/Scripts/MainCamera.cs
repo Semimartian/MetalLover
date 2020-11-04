@@ -60,7 +60,7 @@ public class MainCamera : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        if(!goneToFinalDestination)
         {
             Vector3 targetPosition = lookAtTarget.position;
 
@@ -112,6 +112,41 @@ public class MainCamera : MonoBehaviour
 
     }
 
+    private bool goneToFinalDestination = false;
+    [SerializeField] Transform finalDestination;
+    [SerializeField] private AnimationCurve finalDestinationCurve;
+
+    public IEnumerator GoToFinalDestination()
+    {
+        goneToFinalDestination = true;
+
+        float time = 0;
+        float endTime = finalDestinationCurve.keys[finalDestinationCurve.length - 1].time;
+        Transform myTransform = transform;
+
+        Vector3 targetPosition = finalDestination.position;
+        Quaternion targetRotation = finalDestination.rotation;
+        Vector3 originalPosition = myTransform.position;
+        Quaternion originalRotation = myTransform.rotation;
+
+        while (time < endTime)
+        {
+            //float deltaTime = Time.deltaTime;
+            time += Time.deltaTime;
+
+            float t = finalDestinationCurve.Evaluate(time);
+
+            myTransform.position = Vector3.Lerp(originalPosition, targetPosition, t);
+            myTransform.rotation = Quaternion.Lerp(originalRotation, targetRotation, t);
+
+            yield return null;
+
+        }
+
+
+        myTransform.position = targetPosition;
+        myTransform.rotation = targetRotation;
+    }
 }
 /*Vector3 myEuler = myTransform.rotation.eulerAngles;
 float yAngle = Mathf.Lerp(lookAttarget.rotation.eulerAngles.y, myEuler.y,0.2f*Time.deltaTime);*/

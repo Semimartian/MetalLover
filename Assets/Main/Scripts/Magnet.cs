@@ -11,6 +11,7 @@ public struct Attraction
 }
 public class Magnet : MonoBehaviour
 {
+    public MagnetDistortion distortionEffect;
     [SerializeField] private Attraction attractionField;
     public virtual Attraction AttractionField
     {
@@ -50,7 +51,15 @@ public class Magnet : MonoBehaviour
         rigidbody.MovePosition(position);
     }
 
-
+    public void RefreshDistortionEffect()
+    {
+        if(distortionEffect == null)
+        {
+            Debug.LogError("No Distortion effect on this magnet!");
+            return;
+        }
+        distortionEffect.Refresh(AttractionField.centre, AttractionField.radius);
+    }
     /*public virtual void AttachMetalObject(MetalObject metalObject)
     {
         //metalObject.transform.parent = transform;

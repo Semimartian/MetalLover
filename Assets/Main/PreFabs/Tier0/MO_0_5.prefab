@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 2256719525584760711}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_Children: []
   m_Father: {fileID: 8369870933135269231}
   m_RootOrder: 0
@@ -267,7 +267,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 8369870933135269230}
-  attractionForce: 250
   tier: 0
   permenantlyAttatched: 0
 --- !u!54 &8369870933135269230

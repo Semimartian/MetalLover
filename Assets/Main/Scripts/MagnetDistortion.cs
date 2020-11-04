@@ -12,7 +12,7 @@ public class MagnetDistortion : MonoBehaviour
         transform.position = target.position;
     }
 
-    public void Constructor(Transform target,float radius)
+    public void Refresh(Transform target,float radius)
     {
         this.target = target;
         ParticleSystem.ShapeModule module =  particleSystem.shape;
@@ -22,4 +22,5 @@ public class MagnetDistortion : MonoBehaviour
        // particleSystem.set
         //particleSystem.shape = new ParticleSystem.ShapeModule();
     }
+
 }

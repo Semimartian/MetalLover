@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -13,6 +14,8 @@ public class Magneto : Magnet
         public float sizeMultiplier;
         public float mass;
         public float speed;
+        public float angularDrag;
+        public float gravity;
 
         public Attraction attractionField;
     }
@@ -26,19 +29,25 @@ public class Magneto : Magnet
 
     [SerializeField] private sbyte currentMagnetoLevelIndex = 0;
     //public sbyte CurrentMagnetoLevelIndex => currentMagnetoLevelIndex;
-    private Transform myTransform;
+    [Header("Speeds:")]
 
     [SerializeField] float rotationPerSecond;
-    [SerializeField] float defaultSpeed;
+    [SerializeField] private float scaleSpeed;
+    private float speedBoost;
+
+    [Header("Related Objects:")]
+    private Transform myTransform;
+    [Header("Related Objects:")]
+    [SerializeField] private Transform body;
+    [SerializeField] private Transform shellBody;
+    [SerializeField] private Shell shell;
+    [SerializeField] private MainCamera camera;
+    [SerializeField] private AudioSource ScaleAudioSource;
+    [Header("Debugging")]
     [SerializeField] float velocity;
     [SerializeField] Text debugText;
-    [SerializeField] private MainCamera camera;
-
     //[SerializeField] private float currentBoostlessSpeed;
-
-    //[SerializeField] private float speedCheckInterval = 0.3f;
-   // [SerializeField] private int attachedObjects;
-
+    // [SerializeField] private int attachedObjects;
 
     public override void Initialise()
     {
@@ -47,7 +56,7 @@ public class Magneto : Magnet
 
         magnetoLevel = magnetoLevels[0];
 
-        ConformToMagnetoLevel(0,3);
+        ConformToMagnetoLevel(0,2);
         InvokeRepeating("UpdateDebugText", 1, 0.2f);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;              
@@ -64,18 +73,22 @@ public class Magneto : Magnet
         StartCoroutine(Scale(newLevelIndex, waitTime));
     }
 
-    [SerializeField] private Transform body;
-    [SerializeField] private Shell shell;
 
-
-    [SerializeField] private float scaleSpeed;
     private IEnumerator Scale(sbyte newLevelIndex, float waitTime)
     {
+        ScaleAudioSource.Play();
+
         MagnetoLevel nextLevel = magnetoLevels[newLevelIndex];
         float scaleMultiplier = nextLevel.sizeMultiplier;
         float previousMass = rigidbody.mass;
         float previousSize = body.localScale.x;
 
+
+        float blinkInterval = 0.06f;
+        float nextBlink = Time.time;
+
+        List<MeshRenderer> renderers = new List<MeshRenderer>();
+        renderers.AddRange(GetComponentsInChildren<MeshRenderer>());
        // if (currentMagnetoLevelIndex > 0)
         {
             //TODO: this whole logic thing is sloppyy
@@ -91,46 +104,79 @@ public class Magneto : Magnet
             yield return new WaitForFixedUpdate();
             Vector3 scaleAddition = Vector3.one * (scaleMultiplier * Time.fixedDeltaTime * scaleSpeed);
             body.localScale += scaleAddition;
-            shell.transform.localScale += scaleAddition;
+            shellBody.localScale += scaleAddition;
+
+            if (distortionEffect != null)
+            {
+                distortionEffect.transform.localScale += scaleAddition;   
+            }
+
             {
                 float newMass = Mathf.Lerp(previousMass, nextLevel.mass,
                   ((body.localScale.x - previousSize) / (scaleMultiplier - previousSize)));
                 rigidbody.mass = newMass;
             }
-        }
-        body.localScale = Vector3.one * scaleMultiplier;
-        shell.transform.localScale = Vector3.one * scaleMultiplier;
 
-        centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
+            //Blink:
+            if(nextBlink < Time.time )
+            {
+                nextBlink = Time.time + blinkInterval;
+                foreach (MeshRenderer renderer in renderers)
+                {
+                    renderer.enabled = !renderer.enabled;
+                }
+            }
+        }
+
+        Vector3 scale = Vector3.one * scaleMultiplier;
+        body.localScale = scale;
+        shellBody.localScale = scale;
+
+        //centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
         rigidbody.mass = nextLevel.mass;
+        rigidbody.angularDrag = nextLevel.angularDrag;
 
         magnetoLevel = nextLevel;
 
         MagnetManager.ConformToMagnetoLevel(newLevelIndex, waitTime);
         currentMagnetoLevelIndex = newLevelIndex;
 
+
+        foreach (MeshRenderer renderer in renderers)
+        {
+            renderer.enabled = true;
+        }
+       /// RefreshDistortionEffect();
+    }
+
+    internal void LoseShell()
+    {
+       shell.gameObject.layer = 0;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.M))
         {
             currentMagnetoLevelIndex++;
             ConformToMagnetoLevel((sbyte)(currentMagnetoLevelIndex + 1),0);
         }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            rigidbody.angularDrag = 1.25f;
+        }
     }
 
+   /* private static readonly float smallXRotaionClampValue = 60;
+    private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;*/
 
-    private static readonly float smallXRotaionClampValue = 60;
-    private static readonly float largeXRotaionClampValue = 360 - smallXRotaionClampValue;
-    [SerializeField]
-    private Transform centreOfMassTransform ;
-    private Vector3 centreOfMass;
+    //private Vector3 centreOfMass;
     private void FixedUpdate()
     {
-         velocity = rigidbody.velocity.magnitude;
-  
+        velocity = rigidbody.velocity.magnitude;
+        rigidbody.velocity += Vector3.down * magnetoLevel.gravity * Time.fixedDeltaTime;
         //if (!attached)
         float mouseMovement = Input.GetAxisRaw("Mouse X");
         float deltaTime = Time.fixedDeltaTime;
@@ -162,12 +208,16 @@ public class Magneto : Magnet
         //Debug.Log("-----------");
 
 
-       // Quaternion currentRotationQurternion = rigidbody.rotation;
-       // Vector3 currentRotation = currentRotationQurternion.eulerAngles;// myTransform.eulerAngles;
-                                                                        //Debug.Log("angle x" + currentRotation.x);
-                                                                        //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
+        // Quaternion currentRotationQurternion = rigidbody.rotation;
+        // Vector3 currentRotation = currentRotationQurternion.eulerAngles;// myTransform.eulerAngles;
+        //Debug.Log("angle x" + currentRotation.x);
+        //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
 
-        //rigidbody.angularVelocity = new Vector3()
+
+
+      //  rigidbody.angularVelocity = new Vector3();
+
+
         // Debug.Log("angularVelocity" + angularVelocity);
        /* Debug.Log("rigidbody.centerOfMass" + rigidbody.centerOfMass);
 
@@ -188,8 +238,6 @@ public class Magneto : Magnet
             //Debug.Log("angle x" + currentRotation.x);
         }
 
-
-
         /* float time = Time.time;
          if (time > lastSpeedCheck + speedCheckInterval)
          {
@@ -200,15 +248,11 @@ public class Magneto : Magnet
         shell.rigidbody.MovePosition(rigidbody.position + (Movement*0.1f));
         shell.rigidbody.MoveRotation(currentRotationQurternion);
     }
-
-  
+ 
     public void AddForce(Vector3 force, ForceMode mode)
     {
         rigidbody.AddForce(force, mode);
     }
-
-    
-   [SerializeField] private float speedBoost;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -248,5 +292,4 @@ public class Magneto : Magnet
         "Attached: " + attachedObjects*/;
     }
     //public float GetVelocity() => velocity;
-
 }
