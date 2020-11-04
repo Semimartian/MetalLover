@@ -45,8 +45,8 @@ public class WarpDriveEffect : MonoBehaviour
         if(alpha != desiredAlpha)
         {
             float multiplier = alpha > desiredAlpha ? -1 : 1;
-            Debug.Log("fading");
-            Debug.Log("alpha" + alpha);
+          /*  Debug.Log("fading");
+            Debug.Log("alpha" + alpha);*/
 
             alpha += fadeSpeed * deltaTime * multiplier;
             Color currentColour = particlesMat.color;

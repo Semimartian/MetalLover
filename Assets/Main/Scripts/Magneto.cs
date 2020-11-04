@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -13,6 +14,8 @@ public class Magneto : Magnet
         public float sizeMultiplier;
         public float mass;
         public float speed;
+        public float angularDrag;
+        public float gravity;
 
         public Attraction attractionField;
     }
@@ -132,6 +135,7 @@ public class Magneto : Magnet
         //centreOfMassTransform.localPosition = centreOfMassTransform.localPosition * (scaleMultiplier / previousSize);
 
         rigidbody.mass = nextLevel.mass;
+        rigidbody.angularDrag = nextLevel.angularDrag;
 
         magnetoLevel = nextLevel;
 
@@ -146,12 +150,22 @@ public class Magneto : Magnet
        /// RefreshDistortionEffect();
     }
 
+    internal void LoseShell()
+    {
+       shell.gameObject.layer = 0;
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
             currentMagnetoLevelIndex++;
             ConformToMagnetoLevel((sbyte)(currentMagnetoLevelIndex + 1),0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            rigidbody.angularDrag = 1.25f;
         }
     }
 
@@ -161,8 +175,8 @@ public class Magneto : Magnet
     //private Vector3 centreOfMass;
     private void FixedUpdate()
     {
-         velocity = rigidbody.velocity.magnitude;
-  
+        velocity = rigidbody.velocity.magnitude;
+        rigidbody.velocity += Vector3.down * magnetoLevel.gravity * Time.fixedDeltaTime;
         //if (!attached)
         float mouseMovement = Input.GetAxisRaw("Mouse X");
         float deltaTime = Time.fixedDeltaTime;
@@ -199,7 +213,11 @@ public class Magneto : Magnet
         //Debug.Log("angle x" + currentRotation.x);
         //currentRotation.x = Mathf.Clamp(currentRotation.x, clampValue, 360 - clampValue);
 
-        rigidbody.angularVelocity = new Vector3();
+
+
+      //  rigidbody.angularVelocity = new Vector3();
+
+
         // Debug.Log("angularVelocity" + angularVelocity);
        /* Debug.Log("rigidbody.centerOfMass" + rigidbody.centerOfMass);
 
@@ -230,8 +248,7 @@ public class Magneto : Magnet
         shell.rigidbody.MovePosition(rigidbody.position + (Movement*0.1f));
         shell.rigidbody.MoveRotation(currentRotationQurternion);
     }
-
-  
+ 
     public void AddForce(Vector3 force, ForceMode mode)
     {
         rigidbody.AddForce(force, mode);

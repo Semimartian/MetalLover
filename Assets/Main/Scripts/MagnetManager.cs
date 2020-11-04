@@ -56,7 +56,6 @@ public class MagnetManager : MonoBehaviour
     }
 
 
-
     private void CreateMagnetDistortions()
     {
         for (int i = 0; i < magnets.Length; i++)
@@ -96,6 +95,8 @@ public class MagnetManager : MonoBehaviour
 
     }
 
+    
+
     #region Draw:
     private bool drawAttractionFields = false;
     private void Update()
@@ -103,7 +104,19 @@ public class MagnetManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             drawAttractionFields = !drawAttractionFields;
-        }   
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            magneto.LoseShell();
+            for (int i = 0; i < metalObjects.Length; i++)
+            {
+                if (metalObjects[i].attatched)
+                {
+                    DettachFromeShell(metalObjects[i]);
+                }
+            }
+        }
+
     }
 
     private void OnDrawGizmos()
@@ -143,7 +156,7 @@ public class MagnetManager : MonoBehaviour
         for (int i = 0; i < metalObjects.Length; i++)
         {
             MetalObject metalObject = metalObjects[i];
-            if (!metalObject.permenantlyAttatched)
+            if (!metalObject.attatched)
             {
                 int outlineIndex;
                 int physicsLayer;
@@ -244,7 +257,7 @@ public class MagnetManager : MonoBehaviour
         sbyte magnetoLevel = MagnetoLevelIndex;
         for (int j = 0; j < magnets.Length; j++)
         {
-            bool isMagneto = /*metalObjectsToAttractMagneto &&*/( magnets[j] == magneto);
+            //bool isMagneto = /*metalObjectsToAttractMagneto &&*/( magnets[j] == magneto);
             Attraction magnetAttraction = magnets[j].AttractionField;
             Bounds bounds = new Bounds
                 (magnetAttraction.centre.position, Vector3.one * magnetAttraction.radius * boundsExpansion);
@@ -254,7 +267,7 @@ public class MagnetManager : MonoBehaviour
             for (int i = 0; i < metalObjects.Length; i++)
             {
                 MetalObject metalObject = metalObjects[i];
-                if (metalObject.permenantlyAttatched || metalObject.Tier > magnetoLevel)
+                if (metalObject.attatched || (metalObject.Tier > magnetoLevel && metalObject.attractionForce==0))
                 {
                     continue;
                 }
@@ -290,15 +303,17 @@ public class MagnetManager : MonoBehaviour
 
 
                         // bool attract = true;
-                        //if ( false && isMagneto)// && magnetoLevel < metalObject.Tier)
+                        if ( /* isMagneto  &&*/  metalObject.attractionForce != 0 )
                         {
-                            /* if( false && magnetoLevel < metalObject.Tier)
-                             {
-                                 if (metalObjectsToAttractMagneto )
-                                 {
-                                     magneto.AddForce
-                                     ((metalObjectPosition - magnetAttraction.centre.position).normalized
-                                     * (metalObject.attractionForce /** deltaTime), ForceMode.Force);
+                            Debug.Log(" metalObject.attractionForce != 0");
+                            /*if( false && magnetoLevel < metalObject.Tier)
+                            {*/
+                            //if (metalObjectsToAttractMagneto )
+                            // {
+                            magneto.AddForce
+                            ((metalObjectPosition - magnetAttraction.centre.position).normalized
+                            * (metalObject.attractionForce), ForceMode.Force);
+                                     /* deltaTime), ForceMode.Force);
                                  }
                              }
                              else *//*if (magnetoLevel > metalObject.Tier)
@@ -313,13 +328,11 @@ public class MagnetManager : MonoBehaviour
 
                         // if (attract)
                         #endregion
-
+                        else if(metalObject.Tier <= magnetoLevel)
                         {
                             metalObject.rigidbody.AddForce
                               ((magnetAttraction.centre.position - metalObjectPosition).normalized
                               * (attractionSpeed /** deltaTime*/), ForceMode.Force);
-
-
                         }
                   }
                 }
@@ -334,7 +347,9 @@ public class MagnetManager : MonoBehaviour
         Transform metalObjectTransform = metalObject.transform;
         Rigidbody metalObjectRigidbody =  metalObject.rigidbody;
         metalObjectRigidbody.velocity = Vector3.zero;
-        Destroy(metalObjectRigidbody);
+        // Destroy(metalObjectRigidbody);
+
+        metalObjectRigidbody.isKinematic =true;
 
         metalObjectTransform.position = point;// metalObjectRigidbody.position;
 
@@ -342,14 +357,32 @@ public class MagnetManager : MonoBehaviour
 
         metalObjectTransform.parent = instance.magnetoShellTransform;
 
-        metalObject.permenantlyAttatched = true;
+        metalObject.attatched = true;
+    }
+
+    public static void DettachFromeShell(MetalObject metalObject)
+    {
+        Transform metalObjectTransform = metalObject.transform;
+        Rigidbody metalObjectRigidbody = metalObject.rigidbody;
+        metalObjectRigidbody.velocity = Vector3.zero;
+
+        metalObjectRigidbody.isKinematic = false;
+
+        ModifyPhysicsLayerOf(metalObjectTransform, instance.currentTierLayer);
+
+        metalObjectTransform.parent =  null;
+
+        metalObject.attatched = false;
     }
 
     private void AttatchPermenantly(MetalObject metalObject, Magnet magnet)
     {
+        Debug.LogError("Not implemented!");
+        return;
         metalObject.rigidbody.velocity = Vector3.zero;
-        metalObject.permenantlyAttatched = true;
+        metalObject.attatched = true;
         Destroy(metalObject.rigidbody);
+
         RemoveCollidersFrom(metalObject.transform);
 
         metalObject.transform.parent = magnet.transform;
@@ -361,6 +394,9 @@ public class MagnetManager : MonoBehaviour
 
     private void ManageMagnetoAgainstMagnets(/*float deltaTime*/)
     {
+        Debug.LogError("This function hasnt been touched for too long");
+        return;
+
         Vector3 magnetoPosition = magneto.transform.position;
 
         for (int j = 0; j < magnets.Length; j++)

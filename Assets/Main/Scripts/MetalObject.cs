@@ -13,7 +13,7 @@ public class MetalObject : MonoBehaviour
 
     [SerializeField] private sbyte tier;
 
-    public bool permenantlyAttatched = false;
+    public bool attatched = false;
     public sbyte Tier
     {
         get { return tier; }
@@ -21,23 +21,49 @@ public class MetalObject : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+
+
         int collisionLayer = collision.gameObject.layer;
         if (collisionLayer == MAGNETO_SHELL_LAYER)// && collision.collider.gameObject.name == "Magnet")
         {
-            SoundNames soundName;
-            switch (tier)
-            {
-                case 0:
-                    soundName = SoundNames.Tier0Impact;break;
-                case 1:
-                    soundName = SoundNames.Tier1Impact; break;
-                case 2:
-                    soundName = SoundNames.Tier2Impact; break;
-                default:
-                    soundName = SoundNames.Tier0Impact; break;
 
-            }
+            // attachMe = true;
+            AttachToMagneto(collision);
+        }
+    }
 
+    private bool attachMe = false;
+    public float attractionForce;
+
+    /* private void FixedUpdate()
+     {
+         if (attachMe)
+         {
+             AttachToMagneto(null);
+             attachMe = false;
+         }
+     }*/
+
+    private void AttachToMagneto(Collision collision)
+    {
+        SoundNames soundName;
+        switch (tier)
+        {
+            case 0:
+                soundName = SoundNames.Tier0Impact; break;
+            case 1:
+                soundName = SoundNames.Tier1Impact; break;
+            case 2:
+                soundName = SoundNames.Tier2Impact; break;
+            default:
+                soundName = SoundNames.Tier0Impact; break;
+
+        }
+
+        Vector3 point = new Vector3();
+        bool complexPointFinding = false;
+        if (complexPointFinding)
+        {
             int contactCount = collision.contactCount;
             Debug.Log("collision.contactCount: " + contactCount);
 
@@ -47,13 +73,13 @@ public class MetalObject : MonoBehaviour
                  averagePosition += collision.GetContact(i).point;
              }
              averagePosition /= (contactCount);//*2);*/
-            var contacts =  collision.contacts;
-           // float distance = 0;
+            var contacts = collision.contacts;
+            // float distance = 0;
             Vector3 averagePoint = new Vector3();
             //Vector3 point = new Vector3();
             for (int i = 0; i < contactCount; i++)
             {
-               // distance += contacts[i].separation;
+                // distance += contacts[i].separation;
                 averagePoint += contacts[i].point;
                 //averagePoint = contacts[i].thisCollider.
                 Debug.Log("separation" + contacts[i].separation);
@@ -61,22 +87,26 @@ public class MetalObject : MonoBehaviour
 
 
             averagePoint /= contactCount;
-            float distance = (rigidbody.position - collision.rigidbody.position).magnitude /5;
+            float distance = (rigidbody.position - collision.rigidbody.position).magnitude / 5;
             /* Vector3 seperation =
                  (contacts[0].otherCollider.ClosestPoint(averagePoint) 
                  - contacts[0].thisCollider.ClosestPoint(averagePoint));*/
             // distance /= contactCount;
-            Vector3 point = (rigidbody.position + (averagePoint * distance)) / (distance+1);
-                // seperation;
-              //  (distance * (this.rigidbody.position-collision.rigidbody.position ).normalized);
-
-
-            SoundManager.PlayOneShotSoundAt(soundName, point);
-
-            MagnetManager.AttachToMagnetoShell(this, point);
-
-            GameManager.SpawnScoreFeedbackUI(point, tier);
+            point = (rigidbody.position + (averagePoint * distance)) / (distance + 1);
         }
+        else
+        {
+            point = rigidbody.position;// + ((rigidbody.velocity).normalized * 0.4f);
+        }
+        // seperation;
+        //  (distance * (this.rigidbody.position-collision.rigidbody.position ).normalized);
+
+
+        SoundManager.PlayOneShotSoundAt(soundName, point);
+
+        MagnetManager.AttachToMagnetoShell(this, point);
+
+        GameManager.SpawnScoreFeedbackUI(point, tier);
     }
     //public Magnet magnetAttached =null;
     /*public bool IsAttachedTo(Magnet magnet)
