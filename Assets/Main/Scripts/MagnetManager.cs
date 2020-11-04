@@ -108,6 +108,7 @@ public class MagnetManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
         {
             magneto.LoseShell();
+            FindObjectOfType<MainCamera>().GoBack();
             for (int i = 0; i < metalObjects.Length; i++)
             {
                 if (metalObjects[i].attatched)

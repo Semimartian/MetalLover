@@ -1379,9 +1379,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 8369870933135269230}
-  attractionForce: 5000
   tier: 2
-  permenantlyAttatched: 0
+  attatched: 0
+  attractionForce: 0
 --- !u!54 &8369870933135269230
 Rigidbody:
   m_ObjectHideFlags: 0
