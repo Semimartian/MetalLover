@@ -36,7 +36,7 @@ public class Magneto : Magnet
     private float speedBoost;
 
     [Header("Related Objects:")]
-    private Transform myTransform;
+    public Transform myTransform;
     [Header("Related Objects:")]
     [SerializeField] private Transform body;
     [SerializeField] private Transform shellBody;

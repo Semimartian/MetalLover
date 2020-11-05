@@ -119,9 +119,11 @@ public class MainCamera : MonoBehaviour
 
     private IEnumerator GoBackCoroutine()
     {
+        yield return new WaitForSeconds(0.8f);
+
         shouldFollow = false;
         Vector3 direction = -transform.forward;
-        float speed = 0.4f;
+        float speed = 0.6f;
 
         while (true)
         {

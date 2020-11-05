@@ -5,23 +5,25 @@ using UnityEngine;
 [System.Serializable]
 public struct Attraction
 {
-    public Transform centre;
+    public Transform attractopnPoint;
     public float radius;
     public float force;
 }
 public class Magnet : MonoBehaviour
 {
     public MagnetDistortion distortionEffect;
+    public Transform distortionEffectPoint;
+
     [SerializeField] private Attraction attractionField;
     public virtual Attraction AttractionField
-    {
+    { 
         get { return attractionField; }
     }
 
     public void DrawAttractionField()
     {
         Attraction attraction = AttractionField;
-        Gizmos.DrawWireSphere(attraction.centre.position, attraction.radius);
+        Gizmos.DrawWireSphere(attraction.attractopnPoint.position, attraction.radius);
     }
     //[SerializeField] private SphereCollider attractionSphere;
 
@@ -32,19 +34,14 @@ public class Magnet : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody>();
         //attractionDistance = attractionSphere.radius;
-        if (attractionField.centre == null)
+        if (attractionField.attractopnPoint == null)
         {
-            attractionField.centre = transform;
+            attractionField.attractopnPoint = transform;
         }
 
         //attractionSphere.isTrigger = true;
        // Destroy(attractionSphere);
     }
-
-   /* public virtual void UpdateAttractionField()
-    {
-        Gizmos.dra
-    }*/
 
     public void MovePhysically(Vector3 position)
     {
@@ -58,7 +55,9 @@ public class Magnet : MonoBehaviour
             Debug.LogError("No Distortion effect on this magnet!");
             return;
         }
-        distortionEffect.Refresh(AttractionField.centre, AttractionField.radius);
+        distortionEffect.Refresh(distortionEffectPoint, AttractionField.radius);
+       // distortionEffect.Refresh(AttractionField.attractopnPoint, AttractionField.radius);
+
     }
     /*public virtual void AttachMetalObject(MetalObject metalObject)
     {

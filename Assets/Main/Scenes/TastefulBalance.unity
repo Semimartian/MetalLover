@@ -18025,7 +18025,7 @@ PrefabInstance:
     - target: {fileID: 2605927892835533456, guid: 57efd55029479f545ac9752e882eab41,
         type: 3}
       propertyPath: m_UseGravity
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2605927892835533459, guid: 57efd55029479f545ac9752e882eab41,
         type: 3}
@@ -18232,6 +18232,36 @@ PrefabInstance:
       propertyPath: ScaleAudioSource
       value: 
       objectReference: {fileID: 1207097140}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[0].angularDrag
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[0].gravity
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[1].gravity
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[2].gravity
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[1].angularDrag
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605927892835533471, guid: 57efd55029479f545ac9752e882eab41,
+        type: 3}
+      propertyPath: magnetoLevels.Array.data[2].angularDrag
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4961100895889327156, guid: 57efd55029479f545ac9752e882eab41,
         type: 3}
       propertyPath: m_Enabled

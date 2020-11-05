@@ -14,10 +14,13 @@ public class MagnetDistortion : MonoBehaviour
 
     public void Refresh(Transform target,float radius)
     {
+        float normalRadius = 2;
         this.target = target;
         ParticleSystem.ShapeModule module =  particleSystem.shape;
-       
-        module.radius = radius;
+
+        module.radius = normalRadius;
+        this.transform.localScale = Vector3.one * (radius / normalRadius);
+       // 
 
        // particleSystem.set
         //particleSystem.shape = new ParticleSystem.ShapeModule();
