@@ -150,8 +150,14 @@ public class Magneto : Magnet
        /// RefreshDistortionEffect();
     }
 
+    internal void Freeze()
+    {
+        rigidbody.isKinematic = true;
+    }
+
     internal void LoseShell()
     {
+        
        shell.gameObject.layer = 0;
     }
 
@@ -274,6 +280,8 @@ public class Magneto : Magnet
                 }
             }
         }
+
+
     }
 
     private void OnTriggerExit(Collider other)

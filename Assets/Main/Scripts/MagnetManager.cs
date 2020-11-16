@@ -99,6 +99,8 @@ public class MagnetManager : MonoBehaviour
 
     #region Draw:
     private bool drawAttractionFields = false;
+    private int finalSceneIndex = 0;
+   public static bool MagnetoCanAttach = true;
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
@@ -107,15 +109,38 @@ public class MagnetManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            magneto.LoseShell();
-            FindObjectOfType<MainCamera>().GoBack();
-            for (int i = 0; i < metalObjects.Length; i++)
+            
+            if(finalSceneIndex == 0)
             {
-                if (metalObjects[i].attatched)
+                MagnetoCanAttach = false;
+                magneto.LoseShell();
+                FindObjectOfType<MainCamera>().GoBack();
+                for (int i = 0; i < metalObjects.Length; i++)
                 {
-                    DettachFromeShell(metalObjects[i]);
+                    MetalObject metalObject = metalObjects[i];
+                    if (metalObject.attatched)// && metalObject.Tier == MagnetoLevelIndex)
+                    {
+                        DettachFromeShell(metalObject);
+                    }
+                }
+
+            }
+            else
+            {
+                magneto.Freeze();
+                for (int i = 0; i < metalObjects.Length; i++)
+                {
+                    MetalObject metalObject = metalObjects[i];
+                    if (metalObject.Tier < MagnetoLevelIndex)
+                    {
+                        metalObject.rigidbody.isKinematic = true;
+
+                    }
+
                 }
             }
+
+            finalSceneIndex++;
         }
 
     }
@@ -144,6 +169,7 @@ public class MagnetManager : MonoBehaviour
     public static void ConformToMagnetoLevel(sbyte level, float waitTime)
     {
         MagnetoLevelIndex = level;
+        Debug.Log("MagnetoLevelIndex" + MagnetoLevelIndex);
         instance.Invoke("MyConformToMagnetoLevel", waitTime);
     }
 
@@ -307,7 +333,7 @@ public class MagnetManager : MonoBehaviour
                         // bool attract = true;
                         if ( /* isMagneto  &&*/  metalObject.attractionForce != 0 )
                         {
-                            Debug.Log(" metalObject.attractionForce != 0");
+                           // Debug.Log(" metalObject.attractionForce != 0");
                             /*if( false && magnetoLevel < metalObject.Tier)
                             {*/
                             //if (metalObjectsToAttractMagneto )
@@ -315,6 +341,9 @@ public class MagnetManager : MonoBehaviour
                             magneto.AddForce
                             ((metalObjectPosition - attractionPoint).normalized
                             * (metalObject.attractionForce), ForceMode.Force);
+
+                           
+                            magneto.myTransform.LookAt(metalObjectPosition);
                                      /* deltaTime), ForceMode.Force);
                                  }
                              }

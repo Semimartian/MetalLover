@@ -40,6 +40,8 @@ public class MainCamera : MonoBehaviour
     [SerializeField] private Transform lookAtTarget;
 
     [SerializeField] private float xSpeed = 4;
+    [SerializeField] private float ySpeed = 2;
+
 
     private Transform myTransform;
 
@@ -48,6 +50,8 @@ public class MainCamera : MonoBehaviour
     void Start()
     {
         myTransform = transform;
+      //  movementProperties.fixedY = movementProperties.fixedY+ target
+
     }
     [SerializeField] private cakeslice.OutlineEffect outlineEffect;
     private void Update()
@@ -66,7 +70,10 @@ public class MainCamera : MonoBehaviour
 
             Vector3 moveToPosition = new Vector3();
 
-            moveToPosition.y = movementProperties.fixedY;
+            moveToPosition.y = Mathf.Lerp
+                (myTransform.position.y, targetPosition.y + movementProperties.fixedY, Time.deltaTime * ySpeed);
+
+            // movementProperties.fixedY;
             moveToPosition.z = targetPosition.z;
             moveToPosition += movementProperties.positionOffsetFromTarget;
             moveToPosition.x = Mathf.Lerp

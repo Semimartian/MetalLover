@@ -22,14 +22,17 @@ public class MetalObject : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
 
-
-        int collisionLayer = collision.gameObject.layer;
-        if (collisionLayer == MAGNETO_SHELL_LAYER)// && collision.collider.gameObject.name == "Magnet")
+        if (MagnetManager.MagnetoCanAttach)
         {
+            int collisionLayer = collision.gameObject.layer;
+            if (collisionLayer == MAGNETO_SHELL_LAYER)// && collision.collider.gameObject.name == "Magnet")
+            {
 
-            // attachMe = true;
-            AttachToMagneto(collision);
+                // attachMe = true;
+                AttachToMagneto(collision);
+            }
         }
+
     }
 
     private bool attachMe = false;
@@ -143,3 +146,4 @@ public class MetalObject : MonoBehaviour
         rigidbody.isKinematic = false;
     }*/
 }
+
